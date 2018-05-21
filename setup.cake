@@ -1,11 +1,8 @@
 #load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.1.1"
 
 //#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease
-//#load Cake.Recipe/Cake.Recipe/content
 
-#load Cake.Recipe.PFHelpers/Content/pfhelpers.cake
-#load Cake.Recipe.PFHelpers/Content/pfhelpers-publish.cake
-#load Cake.Recipe.PFHelpers/Content/pfhelpers-versioning.cake
+#load setup.selfbootstrap.cake
 
 //#define CustomGitVersionTool
 //private const string GitVersionTool = "#tool nuget:?package=GitVersion.CommandLine.DotNetCore&version=4.0.0-netstandard0001";
@@ -15,10 +12,10 @@ Environment.SetVariableNames();
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
                             sourceDirectoryPath: "./src",
-                            title: "Cake.Recipe.PF",
+                            title: "Cake.Recipe.PFHelpers",
                             repositoryOwner: "gjones@powerfarming.co.nz",
-                            repositoryName: "Cake.Recipe.PF",
-                            nuspecFilePath: "Cake.Recipe/Cake.Recipe/Cake.Recipe.PF.nuspec",
+                            repositoryName: "Cake.Recipe.PFHelpers",
+                            nuspecFilePath: "Cake.Recipe.PFHelpers/Cake.Recipe.PFHelpers.nuspec",
                             shouldPostToMicrosoftTeams: true
                             );
 
@@ -28,7 +25,7 @@ ToolSettings.SetToolSettings(context: Context);
 
 Task("Init")
     .IsDependentOn("PFInit")
-    .IsDependentOn("Generate-Version-File")
+    .IsDependentOn("Generate-Version-File-PF")
 	.Does(() => {
 		Information("Init");
     });
@@ -36,7 +33,7 @@ Task("Init")
 BuildParameters.Tasks.CleanTask
     .IsDependentOn("PFInit")
     // .IsDependentOn("PFInit-Clean")
-    .IsDependentOn("Generate-Version-File")
+    .IsDependentOn("Generate-Version-File-PF")
     .Does(() => {
     });
 

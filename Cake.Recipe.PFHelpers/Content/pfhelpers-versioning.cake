@@ -23,7 +23,7 @@ public class CustomBuildVersion
     public string CommitDate { get; set; }
 }
 
-Task("Generate-Version-File")
+Task("Generate-Version-File-PF")
     .Does(() => {
         var props = ReadDictionaryFile("./gitversion.properties");
         var versionFilePath = "./BuildVersion.json";
