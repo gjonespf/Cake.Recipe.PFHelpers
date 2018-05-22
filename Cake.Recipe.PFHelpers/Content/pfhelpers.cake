@@ -3,8 +3,11 @@
 // using Newtonsoft.Json;
 // #addin nuget:?package=Cake.Git&version=0.17.0
 
+#load pfhelpers-addins.cake
 #load pfhelpers-publish.cake
 #load pfhelpers-versioning.cake
+#load pfhelpers-npm.cake
+#load pfhelpers-docker.cake
 
 // TOOLS
 public static void ForceDeleteDirectory(string path)
