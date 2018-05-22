@@ -1,5 +1,4 @@
 #load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.1.1"
-
 //#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease
 
 #load setup.selfbootstrap.cake
