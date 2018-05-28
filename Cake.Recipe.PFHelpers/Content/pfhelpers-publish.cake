@@ -25,12 +25,34 @@ Task("Publish-Local")
     });
 
 // PF Publishing
+Task("Publish-LocalNugetCache")
+    .Does(() => {
+        var cacheDir = EnvironmentVariable("LOCAL_NUGET_CACHE");
+        var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+
+        if(!string.IsNullOrEmpty(cacheDir))
+        {
+            EnsureDirectoryExists(cacheDir);
+
+            foreach(var nupkgFile in nupkgFiles)
+            {
+                CopyFile(nupkgFile, cacheDir+"/"+nupkgFile.GetFilename());
+            }
+        } else {
+            Warning("Publish-LocalNugetCache called but no LOCAL_NUGET_CACHE set, files will not be copied");
+        }
+    });
+
 // TODO: RequireAddin and env vars
 Task("Publish-LocalNuget")
     .Does(() => {
         var SourceUrl = EnvironmentVariable("LocalNugetServerUrl");
         var ApiKey = EnvironmentVariable("LocalNugetApiKey");
         var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+
+        if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
+            throw new ApplicationException("Environmental variables 'LocalNugetServerUrl' and 'LocalNugetApiKey' must be set to use this");
+        }
 
         foreach(var nupkgFile in nupkgFiles)
         {
