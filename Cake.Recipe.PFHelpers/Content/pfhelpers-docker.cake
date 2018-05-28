@@ -19,24 +19,10 @@ public class DockerDetails
     public string DefaultRemote { get;set; }
 }
 
-public class ProjectProperties
-{
-    public string ImageName { get; set; }
-    public string ImageDescription { get; set; }
-    public string ImageUrl { get; set; }
-    public string GitUrl { get; set; }
-
-    public string DefaultUser { get;set; }
-    public string DefaultRemote { get;set; }
-    public string DefaultLocal { get;set; }
-    public string DefaultTag { get;set; }
-}
-
 public DockerDetails GetDockerDetails()
 {
     DockerDetails ret = new DockerDetails();
 
-    var propertiesFilePath = "./properties.json";
     var imageName = "UNKNOWN";
     var imageDesc = "UNKNOWN";
     var imageUrl = "UNKNOWN";
@@ -48,16 +34,16 @@ public DockerDetails GetDockerDetails()
         throw new ApplicationException("PFBuildVersion is missing");
     }
 
-    ProjectProperties props = new ProjectProperties();
+    ProjectProperties props = LoadProjectProperties();
+    if(props == null) {
+        throw new ApplicationException("Error loading project properties file, does it exist?");
+    }
+
     if(!string.IsNullOrEmpty(BuildNumber)) {
         buildNumber = BuildNumber;
     }
     if(!string.IsNullOrEmpty(PFBuildVersion.SemVersion)) {
         semVer = PFBuildVersion.SemVersion;
-    }
-    if(FileExists(propertiesFilePath)) {
-        var jsonData = String.Join(System.Environment.NewLine, System.IO.File.ReadAllLines(propertiesFilePath));
-        props = JsonConvert.DeserializeObject<ProjectProperties>(jsonData);
     }
 
     var tip = GitLogTip(repoDir);
@@ -65,14 +51,17 @@ public DockerDetails GetDockerDetails()
     var buildDate = DateTime.Now;
 
     // Update DockerDetails
-    if(!string.IsNullOrEmpty(props.ImageName)) {
-        ret.ImageName = props.ImageName;
+    if(!string.IsNullOrEmpty(props.ProjectCodeName)) {
+        ret.ImageName = props.ProjectCodeName;
     }
-    if(!string.IsNullOrEmpty(props.ImageDescription)) {
-        ret.ImageDescription = props.ImageDescription;
+    if(!string.IsNullOrEmpty(props.ProjectName)) {
+        //ret.ImageName = props.ProjectName;
     }
-    if(!string.IsNullOrEmpty(props.ImageUrl)) {
-        ret.ImageUrl = props.ImageUrl;
+    if(!string.IsNullOrEmpty(props.ProjectDescription)) {
+        ret.ImageDescription = props.ProjectDescription;
+    }
+    if(!string.IsNullOrEmpty(props.ProjectUrl)) {
+        ret.ImageUrl = props.ProjectUrl;
     }
     ret.GitUrl = currentBranch.Remotes.First().Url;
 
@@ -109,12 +98,6 @@ public DockerDetails GetDockerDetails()
     ret.DefaultRemote = props.DefaultRemote + "/" + props.DefaultUser + "/" + (ret.ImageName+":"+semVer);
 
     return ret;
-}
-
-private string GetRFCDate(DateTime dateTime)
-{
-    DateTime UtcDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime);
-    return UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss.fffzzz", System.Globalization.DateTimeFormatInfo.InvariantInfo);        
 }
 
 private string Information(DockerDetails deets)
