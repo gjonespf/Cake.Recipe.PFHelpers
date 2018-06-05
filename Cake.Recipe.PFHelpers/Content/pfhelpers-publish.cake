@@ -69,6 +69,9 @@ Task("Publish-LocalOctopus")
     .Does(() => {
         var SourceUrl = EnvironmentVariable("OctoServerPushUrl");
         var ApiKey = EnvironmentVariable("OCTOAPIKEY");
+        var DestinationName = "Local Octopus";
+
+        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT"}")
 
         var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
 
