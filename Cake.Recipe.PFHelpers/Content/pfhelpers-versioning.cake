@@ -6,6 +6,9 @@ public static string BuildArtifactPath;
 public static string BuildNumber;
 public static CustomBuildVersion PFBuildVersion;
 
+public static string BuildVersionFileName = "BuildVersion.json";
+public static string GitVersionPropertiesFileName = "gitversion.properties";
+
 // VERSIONING
 public class CustomBuildVersion
 {
@@ -21,12 +24,31 @@ public class CustomBuildVersion
     public string BranchName { get; set; }
     public string CommitHash { get; set; }
     public string CommitDate { get; set; }
+    public string BuildId { get; set; }
+    public string BuildUrl { get; set; }
+}
+
+public void SaveBuildVersion(CustomBuildVersion buildVer)
+{        
+    var versionFilePath = $"./{BuildVersionFileName}";
+    if(buildVer != null) {
+        var versionData = JsonConvert.SerializeObject(buildVer, Formatting.Indented);
+
+        System.IO.File.WriteAllText(
+            versionFilePath,
+            versionData
+            );
+    } else {
+        throw new ApplicationException("Tried to write null build version information");
+    }
 }
 
 Task("Generate-Version-File-PF")
+    // Sets up the artifact directory/build numbers
+    .IsDependentOn("PFInit")    
     .Does(() => {
-        var props = ReadDictionaryFile("./gitversion.properties");
-        var versionFilePath = "./BuildVersion.json";
+    var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+    var versionFilePath = $"./{BuildVersionFileName}";
 
         var vers = new CustomBuildVersion() {
             Version = BuildParameters.Version.Version,
@@ -41,19 +63,16 @@ Task("Generate-Version-File-PF")
             BranchName = props["GitVersion_BranchName"],
             CommitHash = props["GitVersion_Sha"],
             CommitDate = props["GitVersion_CommitDate"],
+            BuildId = EnvironmentVariable("BUILD_NUMBER"),
+            BuildUrl = EnvironmentVariable("BUILD_URL"),
         };
         PFBuildVersion = vers;
-        var versionData = JsonConvert.SerializeObject(vers, Formatting.Indented);
-
-        System.IO.File.WriteAllText(
-            versionFilePath,
-            versionData
-            );
+        SaveBuildVersion(vers);
 
         if(BuildArtifactPath != null) {
             Information("Copying versioning to build artifact path: "+BuildArtifactPath);
             EnsureDirectoryExists(BuildArtifactPath);
-            CopyFile(versionFilePath, BuildArtifactPath+"/BuildVersion.json");
+            CopyFile(versionFilePath, BuildArtifactPath+$"/{BuildVersionFileName}");
         } else {
             Error("No artifact path set!");
         }

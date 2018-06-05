@@ -6,6 +6,8 @@
 //#define CustomGitVersionTool
 //private const string GitVersionTool = "#tool nuget:?package=GitVersion.CommandLine.DotNetCore&version=4.0.0-netstandard0001";
 
+var target = "Default";
+
 Environment.SetVariableNames();
 
 BuildParameters.SetParameters(context: Context,
@@ -30,7 +32,6 @@ Task("Init")
     });
 
 BuildParameters.Tasks.CleanTask
-    .IsDependentOn("PFInit")
     // .IsDependentOn("PFInit-Clean")
     .IsDependentOn("Generate-Version-File-PF")
     .Does(() => {
@@ -42,12 +43,11 @@ BuildParameters.Tasks.RestoreTask
     .Does(() => {
     });
 
-// BuildParameters.Tasks.PackageTask.Task.Actions.Clear();
-// BuildParameters.Tasks.PackageTask
-// 	//.IsDependentOn("ATask")
-//     .Does(() => {
-//         Information("TASK: Package");
-// 	});
+BuildParameters.Tasks.PackageTask.Task.Actions.Clear();
+BuildParameters.Tasks.PackageTask
+	.IsDependentOn("Package-GenerateReleaseVersion")
+    .Does(() => {
+	});
 
 BuildParameters.Tasks.BuildTask.Task.Actions.Clear();
 BuildParameters.Tasks.BuildTask
@@ -57,12 +57,25 @@ BuildParameters.Tasks.BuildTask
 
 Task("Publish")
 	.IsDependentOn("Publish-Artifacts")
+	.IsDependentOn("Publish-LocalNugetCache")
 	.IsDependentOn("Publish-LocalNuget")
+	.IsDependentOn("PublishNotify")
 	.Does(() => {
         Information("TASK: Publish");
 	});
 
-
+Task("PublishNotify")
+	.IsDependentOn("PublishNotify-NotifyTeams")
+	.Does(() => {
+        Information("TASK: PublishNotify");
+	});
 
 // Simplified...
+//Build.RunVanilla();
 Build.RunNuGet();
+//RunTarget(target);
+
+Teardown(context =>
+{
+    // Executed AFTER the last task.
+});
