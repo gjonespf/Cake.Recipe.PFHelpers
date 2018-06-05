@@ -66,6 +66,7 @@ buildparameters.json
 *.dist.cake
 AssemblyGeneratedVersion.json
 BuildVersion.json
+ReleaseVersion.json
 /package-lock.json
 .env
 .env/

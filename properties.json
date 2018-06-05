@@ -1,0 +1,11 @@
+{
+    "ProjectName": "Simple global setup for Cake.Recipe - Power Farming",
+    "ProjectCodeName": "Cake.Recipe.PFHelpers",
+    "ProjectDescription": "Simple global setup for Cake.Recipe - Power Farming",
+    "ProjectUrl": "https://github.com/gjonespf/Cake.Recipe.PFHelpers",
+    "Versioning": "gitver",
+    "DefaultTag": "latest",
+    "DefaultUser": "gavinjonespf",
+    "DefaultRemote": "https://nuget.powerfarming.co.nz",
+    "TeamsWebHook": ""
+}
