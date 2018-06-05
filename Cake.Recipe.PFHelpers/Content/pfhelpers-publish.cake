@@ -49,6 +49,8 @@ Task("Publish-LocalNuget")
         var SourceUrl = EnvironmentVariable("LocalNugetServerUrl");
         var ApiKey = EnvironmentVariable("LocalNugetApiKey");
         var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+        var DestinationName = "Local Nuget";
+        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT"}");
 
         if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
             throw new ApplicationException("Environmental variables 'LocalNugetServerUrl' and 'LocalNugetApiKey' must be set to use this");
@@ -71,7 +73,7 @@ Task("Publish-LocalOctopus")
         var ApiKey = EnvironmentVariable("OCTOAPIKEY");
         var DestinationName = "Local Octopus";
 
-        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT"}")
+        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT"}");
 
         var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
 
