@@ -1,18 +1,4 @@
 
-// Original Docker focussed
-// public class ProjectProperties
-// {
-//     public string ImageName { get; set; }
-//     public string ImageDescription { get; set; }
-//     public string ImageUrl { get; set; }
-//     public string GitUrl { get; set; }
-
-//     public string DefaultUser { get;set; }
-//     public string DefaultRemote { get;set; }
-//     public string DefaultLocal { get;set; }
-//     public string DefaultTag { get;set; }
-// }
-
 public class ProjectProperties
 {
     public string ProjectName { get; set; }   
@@ -21,11 +7,13 @@ public class ProjectProperties
     public string ProjectUrl { get; set; }
     public string SourceControlUrl { get; set; }
 
+    // TODO: Rework to be more generic and non docker focussed
     public string DefaultUser { get;set; }
     public string DefaultRemote { get;set; }
     public string DefaultLocal { get;set; }
     public string DefaultTag { get;set; }
 
+    // TODO: Probably split optionals out into a generic property bag
     public string TeamsWebHook { get;set; }
 }
 

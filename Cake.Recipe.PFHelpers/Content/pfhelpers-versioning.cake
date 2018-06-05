@@ -24,6 +24,8 @@ public class CustomBuildVersion
     public string BranchName { get; set; }
     public string CommitHash { get; set; }
     public string CommitDate { get; set; }
+    public string BuildId { get; set; }
+    public string BuildUrl { get; set; }
 }
 
 public void SaveBuildVersion(CustomBuildVersion buildVer)
@@ -45,7 +47,7 @@ Task("Generate-Version-File-PF")
     // Sets up the artifact directory/build numbers
     .IsDependentOn("PFInit")    
     .Does(() => {
-        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+    var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
     var versionFilePath = $"./{BuildVersionFileName}";
 
         var vers = new CustomBuildVersion() {
@@ -61,6 +63,8 @@ Task("Generate-Version-File-PF")
             BranchName = props["GitVersion_BranchName"],
             CommitHash = props["GitVersion_Sha"],
             CommitDate = props["GitVersion_CommitDate"],
+            BuildId = EnvironmentVariable("BUILD_NUMBER"),
+            BuildUrl = EnvironmentVariable("BUILD_URL"),
         };
         PFBuildVersion = vers;
         SaveBuildVersion(vers);

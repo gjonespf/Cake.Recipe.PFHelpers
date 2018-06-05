@@ -3,7 +3,7 @@ var notifyTeamsHook = ProjectProps != null ? ProjectProps.TeamsWebHook : null;
 
 Task("PublishNotify-NotifyTeams")
     .IsDependentOn("PFInit")    
-    //.WithCriteria(!string.IsNullOrEmpty(notifyTeamsHook))
+    .WithCriteria(!string.IsNullOrEmpty(notifyTeamsHook))
 	.Does(() => {
         if(ProjectProps == null) {
             Information("Null props");
@@ -12,6 +12,8 @@ Task("PublishNotify-NotifyTeams")
         Information("TASK: PublishNotify Teams");
         var teamsWebhookUrl = ProjectProps.TeamsWebHook;
         var releaseVersion = LoadReleaseVersion();
+
+        // TODO: How to template this?
         var messageCard = new MicrosoftTeamsMessageCard {
             summary = "Cake posted message using Cake.MicrosoftTeams",
             title = $"New packages for project {ProjectProps.ProjectName} published ({releaseVersion.SemVersion})",
@@ -41,10 +43,16 @@ Task("PublishNotify-NotifyTeams")
             }
         };
 
-        System.Net.HttpStatusCode result = MicrosoftTeamsPostMessage(messageCard,
-        new MicrosoftTeamsSettings {
-            IncomingWebhookUrl = teamsWebhookUrl
-        });
-        Information("Result: "+result.ToString());
+        // TODO: Detect package url types and generate action links?
+
+        if(!string.IsNullOrEmpty(teamsWebhookUrl)) {
+            System.Net.HttpStatusCode result = MicrosoftTeamsPostMessage(messageCard,
+            new MicrosoftTeamsSettings {
+                IncomingWebhookUrl = teamsWebhookUrl
+            });
+            Information("Result: "+result.ToString());
+        } else {
+            Warning("TeamsWebhookUrl wasn't set, so can't send a notification");
+        }
 
 	});
