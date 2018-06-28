@@ -78,6 +78,15 @@ Task("Generate-Version-File-PF")
         }
     });
 
+Task("Create-SolutionInfoVersion")
+	.Does(() => {
+        var solutionFilePath = MakeAbsolute(new FilePath(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs"));
+        if(!FileExists(solutionFilePath)) {
+            Information("Creating missing SolutionInfo file: "+solutionFilePath);
+            System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
+        }
+    });
+    
 Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
