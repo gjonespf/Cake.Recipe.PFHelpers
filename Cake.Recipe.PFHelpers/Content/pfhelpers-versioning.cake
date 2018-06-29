@@ -86,7 +86,10 @@ Task("Create-SolutionInfoVersion")
             System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
         }
     });
-    
+
+// TODO: Should have task to generate AssemblyTemplate from AssemblyInfo files...
+// Basically need a task to set this scheme up from e.g. a new project in VS
+
 Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
