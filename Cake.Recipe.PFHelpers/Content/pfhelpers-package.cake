@@ -11,7 +11,7 @@ Task("Package-GenerateReleaseVersion")
         if(BuildArtifactPath != null) {
             Information("Copying versioning to build artifact path: "+BuildArtifactPath);
             EnsureDirectoryExists(BuildArtifactPath);
-            CopyFile(versionFilePath, BuildArtifactPath);
+            CopyFile(versionFilePath, BuildArtifactPath+$"/{ReleaseVersionFileName}");
         } else {
             Error("No artifact path set!");
         }
