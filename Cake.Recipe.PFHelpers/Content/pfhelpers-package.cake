@@ -7,5 +7,13 @@ Task("Package-GenerateReleaseVersion")
         if(rel != null) {
             SaveReleaseVersion(rel);
         }
+        var versionFilePath = $"./{ReleaseVersionFileName}";
+        if(BuildArtifactPath != null) {
+            Information("Copying versioning to build artifact path: "+BuildArtifactPath);
+            EnsureDirectoryExists(BuildArtifactPath);
+            CopyFile(versionFilePath, BuildArtifactPath);
+        } else {
+            Error("No artifact path set!");
+        }
     });
 

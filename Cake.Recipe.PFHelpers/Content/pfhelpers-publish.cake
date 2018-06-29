@@ -1,18 +1,18 @@
 
-
+// TODO: Repurpose, as we're going to use the Cake.Recipe default ./BuildArtifacts path instead...
 Task("Publish-Artifacts")
     .IsDependentOn("PFInit")
     .Does(() => {
-        var sourceArtifactPath = MakeAbsolute(Directory("./BuildArtifacts/"));
+        //var sourceArtifactPath = MakeAbsolute(Directory("./BuildArtifacts/"));
         if(!string.IsNullOrEmpty(BuildArtifactPath)) {
             Information("Copying artifacts to build artifact path: "+BuildArtifactPath);
             EnsureDirectoryExists(BuildArtifactPath);
 
-            var nupkgs = GetFiles(sourceArtifactPath+"/**/*.nupkg");
-            foreach(var filePath in nupkgs)
-            {
-                CopyFile(filePath, BuildArtifactPath+"/"+filePath.GetFilename());
-            }
+            // var nupkgs = GetFiles(sourceArtifactPath+"/**/*.nupkg");
+            // foreach(var filePath in nupkgs)
+            // {
+            //     CopyFile(filePath, BuildArtifactPath+"/"+filePath.GetFilename());
+            // }
         } else {
             Error("No artifact path set!");
         }

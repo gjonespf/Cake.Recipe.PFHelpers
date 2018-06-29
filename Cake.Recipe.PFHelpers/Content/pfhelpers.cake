@@ -35,7 +35,7 @@ Task("PFInit")
             buildNum = "HASH-"+commitHash;
         }
 
-        var artifactPath = MakeAbsolute(Directory("./.buildenv/"+buildNum)).FullPath;
+        var artifactPath = MakeAbsolute(Directory("./BuildArtifacts/"+buildNum)).FullPath;
         Information("Artifact path set to: "+artifactPath);
         BuildArtifactPath = artifactPath;
         BuildNumber = buildNum;
