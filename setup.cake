@@ -1,6 +1,4 @@
-#load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.1.3"
-//#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease
-
+#load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.2.1"
 #load setup.selfbootstrap.cake
 
 //#define CustomGitVersionTool
@@ -32,28 +30,27 @@ Task("Init")
     });
 
 BuildParameters.Tasks.CleanTask
-    // .IsDependentOn("PFInit-Clean")
     .IsDependentOn("Generate-Version-File-PF")
     .Does(() => {
     });
 
-BuildParameters.Tasks.RestoreTask.Task.Actions.Clear();
-BuildParameters.Tasks.RestoreTask
-	//.IsDependentOn("ATask")
-    .Does(() => {
-    });
+// BuildParameters.Tasks.RestoreTask.Task.Actions.Clear();
+// BuildParameters.Tasks.RestoreTask
+// 	//.IsDependentOn("ATask")
+//     .Does(() => {
+//     });
 
-BuildParameters.Tasks.PackageTask.Task.Actions.Clear();
+//BuildParameters.Tasks.PackageTask.Task.Actions.Clear();
 BuildParameters.Tasks.PackageTask
 	.IsDependentOn("Package-GenerateReleaseVersion")
     .Does(() => {
 	});
 
-BuildParameters.Tasks.BuildTask.Task.Actions.Clear();
-BuildParameters.Tasks.BuildTask
-	.Does(() => {
-        Information("TASK: Build");
-	});
+// BuildParameters.Tasks.BuildTask.Task.Actions.Clear();
+// BuildParameters.Tasks.BuildTask
+// 	.Does(() => {
+//         Information("TASK: Build");
+// 	});
 
 Task("Publish")
 	.IsDependentOn("Publish-Artifacts")
