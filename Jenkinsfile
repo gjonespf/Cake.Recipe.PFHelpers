@@ -14,6 +14,21 @@ pipeline {
     }
 
     stages {
+        stage('Pre') {
+            steps
+            {
+                echo 'Preparing...'
+                script {
+                    if (isUnix()) {
+                        echo 'Running on Unix...'
+                        sh "pwsh ./pre.ps1 -t \"Init\"" 
+                    } else  {
+                        echo 'Running on Windows...'
+                        bat "powershell -ExecutionPolicy Bypass -Command \"& './pre.ps1' -Target \"Init\"\""
+                    }
+                }
+            }
+        }
         stage('Init') {
             steps
             {
