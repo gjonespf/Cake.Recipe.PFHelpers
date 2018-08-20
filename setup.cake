@@ -1,4 +1,4 @@
-#load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.2.1"
+#load "nuget:https://nuget.powerfarming.co.nz/api/odata?package=Cake.Recipe.PF&version=0.3.1"
 #load setup.selfbootstrap.cake
 
 var target = "Default";
