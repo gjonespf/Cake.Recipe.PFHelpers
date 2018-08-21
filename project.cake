@@ -11,6 +11,11 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunGitVersion: true
                             );
 
+BuildParameters.IsDotNetCoreBuild = false;
+BuildParameters.IsNuGetBuild = true;
+
+BuildParameters.Tasks.DefaultTask
+    .IsDependentOn("Build");
 
 Task("Init")
     .IsDependentOn("PFInit")
@@ -33,8 +38,6 @@ BuildParameters.Tasks.PackageTask
 
  BuildParameters.Tasks.BuildTask
      .IsDependentOn("Init");
-
-
 
 Task("Publish")
 	.IsDependentOn("Publish-Artifacts")
