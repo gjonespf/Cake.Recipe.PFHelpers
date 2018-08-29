@@ -18,7 +18,7 @@ pipeline {
             steps
             {
                 echo 'Preparing...'
-                echo 'Using proxy: ${env.HTTP_PROXY}'
+                echo "Using proxy: ${env.HTTP_PROXY}"
                 script {
                     if(fileExists('./pre.ps1')) {
                         if (isUnix()) {
