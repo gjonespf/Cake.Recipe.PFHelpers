@@ -19,8 +19,8 @@ pipeline {
             {
                 echo 'Preparing...'
                 echo 'Using proxy: ${env.HTTP_PROXY}'
-                if(fileExists('./pre.ps1')) {
-                    script {
+                script {
+                    if(fileExists('./pre.ps1')) {
                         if (isUnix()) {
                             echo 'Running on Unix...'
                             sh "pwsh ./pre.ps1 -t \"Init\"" 
@@ -28,9 +28,9 @@ pipeline {
                             echo 'Running on Windows...'
                             bat "powershell -ExecutionPolicy Bypass -Command \"& './pre.ps1' -Target \"Init\"\""
                         }
+                    } else {
+                        echo "Skipping prep as no script exists"
                     }
-                } else {
-                    echo "Skipping prep as no script exists"
                 }
             }
         }
