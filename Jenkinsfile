@@ -109,7 +109,7 @@ pipeline {
     }
 
     post {
-        always {
+        success {
             archiveArtifacts allowEmptyArchive: true, artifacts: 'BuildArtifacts/**', fingerprint: true
         }
     }
