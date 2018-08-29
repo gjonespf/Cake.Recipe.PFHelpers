@@ -19,7 +19,7 @@ pipeline {
             {
                 echo 'Preparing...'
                 echo 'Using proxy: ${env.HTTP_PROXY}'
-                if(fileExists './pre.ps1') {
+                if(fileExists('./pre.ps1')) {
                     script {
                         if (isUnix()) {
                             echo 'Running on Unix...'
