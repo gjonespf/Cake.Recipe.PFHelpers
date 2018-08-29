@@ -18,6 +18,7 @@ pipeline {
             steps
             {
                 echo 'Preparing...'
+                echo 'Using proxy: ${env.HTTP_PROXY}'
                 script {
                     if (isUnix()) {
                         echo 'Running on Unix...'
