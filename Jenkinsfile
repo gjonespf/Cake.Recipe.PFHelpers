@@ -97,7 +97,6 @@ pipeline {
 
     post {
         always {
-            //archiveArtifacts allowEmptyArchive: true, artifacts: '.buildenv/$BUILD_ID/**', fingerprint: true
             archiveArtifacts allowEmptyArchive: true, artifacts: 'BuildArtifacts/**', fingerprint: true
         }
     }

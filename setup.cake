@@ -1,4 +1,4 @@
-#load "nuget:https://nuget.powerfarming.co.nz/api/odata/?package=Cake.Recipe.PF&version=0.3.1"
+#load "nuget:https://nuget.powerfarming.co.nz/api/odata/?package=Cake.Recipe.PF&version=0.3.2"
 #load setup.selfbootstrap.cake
 
 Environment.SetVariableNames();
