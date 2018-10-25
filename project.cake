@@ -60,3 +60,21 @@ Teardown(context =>
     // Executed AFTER the last task.
 });
 
+
+Task("BuildPackage")
+    .IsDependentOn("Build")
+    //.IsDependentOn("PSSign")
+    .IsDependentOn("Package")
+    .Does(() =>
+{
+    //Verbose("ProjClean");
+});
+
+Task("BuildPackagePublish")
+    .IsDependentOn("Build")
+    .IsDependentOn("Package")
+    .IsDependentOn("Publish")
+    .Does(() =>
+{
+    //Verbose("ProjClean");
+});
