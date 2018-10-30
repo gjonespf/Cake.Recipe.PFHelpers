@@ -17,7 +17,14 @@ BuildParameters.IsNuGetBuild = true;
 BuildParameters.Tasks.DefaultTask
     .IsDependentOn("Build");
 
+Task("ConfigureFromProjectParametersFile")
+.WithCriteria<ProjectProperties>((context, data) => !string.IsNullOrEmpty(data.ProjectName))
+.Does<ProjectProperties>(data => {
+    Information("Setting properties based on ProjectProperties file: ", data.ProjectName);
+});
+
 Task("Init")
+    .IsDependentOn("ConfigureFromProjectParametersFile")
     .IsDependentOn("PFInit")
     .IsDependentOn("Generate-Version-File-PF")
 	.Does(() => {
