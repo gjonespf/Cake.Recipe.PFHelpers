@@ -84,6 +84,9 @@ Write-Host "password=$($env:GITKEY)"
 $currentBranch = Get-GitCurrentBranch
 $env:BRANCH_NAME=$env:GITBRANCH=$currentBranch
 
+# Bugs in GitTools...
+$env:IGNORE_NORMALISATION_GIT_HEAD_MOVE=1
+
 # GitVersion Issues with PR builds mean clearing cache between builds is worth doing
 if(Test-Path ".git/gitversion_cache") {
     Remove-Item -Recurse .git/gitversion_cache/* -ErrorAction SilentlyContinue | Out-Null
