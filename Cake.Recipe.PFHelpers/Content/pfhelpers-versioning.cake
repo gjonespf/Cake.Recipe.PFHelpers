@@ -77,10 +77,16 @@ Task("Generate-Version-File-PF")
 
 Task("Create-SolutionInfoVersion")
 	.Does(() => {
-        var solutionFilePath = MakeAbsolute(new FilePath(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs"));
-        if(!FileExists(solutionFilePath)) {
-            Information("Creating missing SolutionInfo file: "+solutionFilePath);
-            System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
+        var baseDir = MakeAbsolute(new DirectoryPath("."));
+        if(baseDir != null && DirectoryExists(baseDir)) {
+            Information("Checking solution path: "+baseDir);
+            var solutionFilePath = MakeAbsolute(new FilePath(baseDir + "/SolutionInfo.cs"));
+            if(!FileExists(solutionFilePath)) {
+                Information("Creating missing SolutionInfo file: "+solutionFilePath);
+                System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
+            }
+        } else {
+            Warning("SolutionDirectoryPath was null?");
         }
     });
 
@@ -91,8 +97,9 @@ Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
 
+        var baseDir = MakeAbsolute(new DirectoryPath("."));
         // Read in solutioninfo
-        var slnInfo = GetFiles(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs").FirstOrDefault();
+        var slnInfo = GetFiles(baseDir + "/SolutionInfo.cs").FirstOrDefault();
         if(slnInfo == null) {
             Error("No solution info file could be found");
             return;

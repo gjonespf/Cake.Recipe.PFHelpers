@@ -2,7 +2,7 @@
 
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
-                            sourceDirectoryPath: "./src",
+                            sourceDirectoryPath: "./",
                             title: "Cake.Recipe.PFHelpers",
                             repositoryOwner: "gjones@powerfarming.co.nz",
                             repositoryName: "Cake.Recipe.PFHelpers",
@@ -17,8 +17,16 @@ BuildParameters.IsNuGetBuild = true;
 BuildParameters.Tasks.DefaultTask
     .IsDependentOn("Build");
 
+Task("ConfigureFromProjectParametersFile")
+.WithCriteria<ProjectProperties>((context, data) => !string.IsNullOrEmpty(data.ProjectName))
+.Does<ProjectProperties>(data => {
+    Information("Setting properties based on ProjectProperties file: ", data.ProjectName);
+});
+
 Task("Init")
+    .IsDependentOn("ConfigureFromProjectParametersFile")
     .IsDependentOn("PFInit")
+    .IsDependentOn("Create-SolutionInfoVersion")
     .IsDependentOn("Generate-Version-File-PF")
 	.Does(() => {
 		Information("Init");
@@ -37,7 +45,10 @@ BuildParameters.Tasks.PackageTask
 	});
 
  BuildParameters.Tasks.BuildTask
-     .IsDependentOn("Init");
+    .IsDependentOn("Init")
+    .IsDependentOn("Generate-AssemblyInfo")
+    .Does(() => {
+	});
 
 Task("Publish")
 	.IsDependentOn("Publish-Artifacts")
@@ -60,3 +71,21 @@ Teardown(context =>
     // Executed AFTER the last task.
 });
 
+
+Task("BuildPackage")
+    .IsDependentOn("Build")
+    //.IsDependentOn("PSSign")
+    .IsDependentOn("Package")
+    .Does(() =>
+{
+    //Verbose("ProjClean");
+});
+
+Task("BuildPackagePublish")
+    .IsDependentOn("Build")
+    .IsDependentOn("Package")
+    .IsDependentOn("Publish")
+    .Does(() =>
+{
+    //Verbose("ProjClean");
+});
