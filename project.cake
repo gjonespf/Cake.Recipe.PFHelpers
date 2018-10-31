@@ -2,7 +2,7 @@
 
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
-                            sourceDirectoryPath: "./src",
+                            sourceDirectoryPath: "./",
                             title: "Cake.Recipe.PFHelpers",
                             repositoryOwner: "gjones@powerfarming.co.nz",
                             repositoryName: "Cake.Recipe.PFHelpers",
@@ -26,6 +26,7 @@ Task("ConfigureFromProjectParametersFile")
 Task("Init")
     .IsDependentOn("ConfigureFromProjectParametersFile")
     .IsDependentOn("PFInit")
+    .IsDependentOn("Create-SolutionInfoVersion")
     .IsDependentOn("Generate-Version-File-PF")
 	.Does(() => {
 		Information("Init");
@@ -44,7 +45,10 @@ BuildParameters.Tasks.PackageTask
 	});
 
  BuildParameters.Tasks.BuildTask
-     .IsDependentOn("Init");
+    .IsDependentOn("Init")
+    .IsDependentOn("Generate-AssemblyInfo")
+    .Does(() => {
+	});
 
 Task("Publish")
 	.IsDependentOn("Publish-Artifacts")

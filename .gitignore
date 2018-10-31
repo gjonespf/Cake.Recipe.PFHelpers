@@ -75,3 +75,5 @@ ReleaseVersion.json
 .build-cache/
 gitversion.properties
 BuildArtifacts/
+
+SolutionInfo.cs
