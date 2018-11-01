@@ -75,9 +75,33 @@ Task("Generate-Version-File-PF")
         }
     });
 
+public DirectoryPath GetVersioningBaseDirectory()
+{
+    var baseDir = MakeAbsolute(new DirectoryPath("."));
+    var solnDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SolutionDirectoryPath));
+    var sourceDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SourceDirectoryPath)); 
+
+    if(DirectoryExists(sourceDir)) {
+        var reason = "Source";
+        baseDir = sourceDir;
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    } else if(DirectoryExists(solnDir)) {
+        var reason = "Solution";
+        baseDir = solnDir;
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    } else {
+        var reason = "BaseDir";
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    }
+
+    return baseDir;
+}
+
+// TODO: This doesn't seem to be created early enough for first builds to work, need to look into this
 Task("Create-SolutionInfoVersion")
 	.Does(() => {
-        var baseDir = MakeAbsolute(new DirectoryPath("."));
+        var baseDir = GetVersioningBaseDirectory();
+
         if(baseDir != null && DirectoryExists(baseDir)) {
             Information("Checking solution path: "+baseDir);
             var solutionFilePath = MakeAbsolute(new FilePath(baseDir + "/SolutionInfo.cs"));
@@ -86,7 +110,7 @@ Task("Create-SolutionInfoVersion")
                 System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
             }
         } else {
-            Warning("SolutionDirectoryPath was null?");
+            Warning("Base directory was null?");
         }
     });
 
@@ -96,8 +120,8 @@ Task("Create-SolutionInfoVersion")
 Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
+        var baseDir = GetVersioningBaseDirectory();
 
-        var baseDir = MakeAbsolute(new DirectoryPath("."));
         // Read in solutioninfo
         var slnInfo = GetFiles(baseDir + "/SolutionInfo.cs").FirstOrDefault();
         if(slnInfo == null) {
