@@ -8,6 +8,7 @@ var initDone =
             && ProjectProps != null;
 Task("PFInit")
     .WithCriteria(!initDone)
+    .IsDependentOn("Create-SolutionInfoVersion")
     .Does(() => {
         // Ensure build number & output directory for artifacts
         var buildNum = EnvironmentVariable("BUILD_NUMBER");

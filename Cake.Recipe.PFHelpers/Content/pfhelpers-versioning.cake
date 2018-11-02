@@ -44,8 +44,8 @@ Task("Generate-Version-File-PF")
     // Sets up the artifact directory/build numbers
     .IsDependentOn("PFInit")    
     .Does(() => {
-    var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
-    var versionFilePath = $"./{BuildVersionFileName}";
+        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+        var versionFilePath = $"./{BuildVersionFileName}";
 
         var vers = new CustomBuildVersion() {
             Version = BuildParameters.Version.Version,
@@ -75,18 +75,50 @@ Task("Generate-Version-File-PF")
         }
     });
 
+public DirectoryPath GetVersioningBaseDirectory()
+{
+    var baseDir = MakeAbsolute(new DirectoryPath("."));
+    var solnDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SolutionDirectoryPath));
+    var sourceDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SourceDirectoryPath)); 
+
+    if(DirectoryExists(sourceDir)) {
+        var reason = "Source";
+        baseDir = sourceDir;
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    } else if(DirectoryExists(solnDir)) {
+        var reason = "Solution";
+        baseDir = solnDir;
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    } else {
+        var reason = "BaseDir";
+        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
+    }
+
+    return baseDir;
+}
+
+// TODO: This doesn't seem to be created early enough for first builds to work, need to look into this
 Task("Create-SolutionInfoVersion")
+    .WithCriteria(BuildParameters.SourceDirectoryPath != null)
 	.Does(() => {
-        var baseDir = MakeAbsolute(new DirectoryPath("."));
+        var baseDir = GetVersioningBaseDirectory();
+
         if(baseDir != null && DirectoryExists(baseDir)) {
             Information("Checking solution path: "+baseDir);
             var solutionFilePath = MakeAbsolute(new FilePath(baseDir + "/SolutionInfo.cs"));
             if(!FileExists(solutionFilePath)) {
                 Information("Creating missing SolutionInfo file: "+solutionFilePath);
                 System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
+
+                // Need to regenerate versioning so that the SolutionInfo file is populated
+                BuildParameters.SetBuildVersion(
+                    BuildVersion.CalculatingSemanticVersion(
+                        context: Context
+                    )
+                );
             }
         } else {
-            Warning("SolutionDirectoryPath was null?");
+            Warning("Base directory was null?");
         }
     });
 
@@ -96,8 +128,8 @@ Task("Create-SolutionInfoVersion")
 Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
+        var baseDir = GetVersioningBaseDirectory();
 
-        var baseDir = MakeAbsolute(new DirectoryPath("."));
         // Read in solutioninfo
         var slnInfo = GetFiles(baseDir + "/SolutionInfo.cs").FirstOrDefault();
         if(slnInfo == null) {
