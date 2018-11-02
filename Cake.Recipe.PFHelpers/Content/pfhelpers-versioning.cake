@@ -44,8 +44,8 @@ Task("Generate-Version-File-PF")
     // Sets up the artifact directory/build numbers
     .IsDependentOn("PFInit")    
     .Does(() => {
-    var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
-    var versionFilePath = $"./{BuildVersionFileName}";
+        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+        var versionFilePath = $"./{BuildVersionFileName}";
 
         var vers = new CustomBuildVersion() {
             Version = BuildParameters.Version.Version,
@@ -99,6 +99,7 @@ public DirectoryPath GetVersioningBaseDirectory()
 
 // TODO: This doesn't seem to be created early enough for first builds to work, need to look into this
 Task("Create-SolutionInfoVersion")
+    .WithCriteria(BuildParameters.SourceDirectoryPath != null)
 	.Does(() => {
         var baseDir = GetVersioningBaseDirectory();
 
@@ -108,6 +109,13 @@ Task("Create-SolutionInfoVersion")
             if(!FileExists(solutionFilePath)) {
                 Information("Creating missing SolutionInfo file: "+solutionFilePath);
                 System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
+
+                // Need to regenerate versioning so that the SolutionInfo file is populated
+                BuildParameters.SetBuildVersion(
+                    BuildVersion.CalculatingSemanticVersion(
+                        context: Context
+                    )
+                );
             }
         } else {
             Warning("Base directory was null?");
