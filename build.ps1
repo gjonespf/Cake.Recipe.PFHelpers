@@ -160,8 +160,13 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     [string] $md5Hash = MD5HashFile($PACKAGES_CONFIG)
     if((!(Test-Path $PACKAGES_CONFIG_MD5)) -Or
       ($md5Hash -ne (Get-Content $PACKAGES_CONFIG_MD5 ))) {
-        Write-Verbose -Message "Missing or changed package.config hash..."
-        Remove-Item * -Recurse -Exclude packages.config,nuget.exe
+        Write-Host -Message "Missing or changed package.config hash..."
+        foreach($dir in $(gci * -Directory))
+        {
+            Write-Host "Removing directory: $($dir.FullName)"
+            Get-Childitem $dir.FullName -Recurse | Remove-Item -Recurse -Force -Confirm:$false
+            Remove-Item -Path $dir -Recurse -Force -Confirm:$false
+        }
     }
 
     Write-Verbose -Message "Restoring tools from NuGet..."
