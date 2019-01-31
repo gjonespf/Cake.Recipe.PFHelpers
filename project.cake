@@ -17,6 +17,12 @@ BuildParameters.IsNuGetBuild = true;
 BuildParameters.Tasks.DefaultTask
     .IsDependentOn("Build");
 
+// Setup(context =>
+// {
+// });
+
+// TODO: Should be baked in
+// TODO: Should be run from PFInit / how PFInit is run?
 Task("ConfigureFromProjectParametersFile")
 .WithCriteria<ProjectProperties>((context, data) => !string.IsNullOrEmpty(data.ProjectName))
 .Does<ProjectProperties>(data => {
@@ -69,23 +75,4 @@ Task("PublishNotify")
 Teardown(context =>
 {
     // Executed AFTER the last task.
-});
-
-
-Task("BuildPackage")
-    .IsDependentOn("Build")
-    //.IsDependentOn("PSSign")
-    .IsDependentOn("Package")
-    .Does(() =>
-{
-    //Verbose("ProjClean");
-});
-
-Task("BuildPackagePublish")
-    .IsDependentOn("Build")
-    .IsDependentOn("Package")
-    .IsDependentOn("Publish")
-    .Does(() =>
-{
-    //Verbose("ProjClean");
 });
