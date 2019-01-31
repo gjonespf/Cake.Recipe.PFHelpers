@@ -12,6 +12,7 @@ public class DockerDetails
     public string DefaultLocal { get;set; }
     public string[] RemoteTags { get; set; }
     public string DefaultRemote { get;set; }
+    public string DefaultRepo { get;set; }
 }
 
 public DockerDetails GetDockerDetails()
@@ -59,6 +60,20 @@ public DockerDetails GetDockerDetails()
         ret.ImageUrl = props.ProjectUrl;
     }
     ret.GitUrl = currentBranch.Remotes.First().Url;
+    
+    // Cache build args
+    var httpProxy = EnvironmentVariable("http_proxy");
+    if(!string.IsNullOrEmpty(httpProxy)) {
+        Information("Using HTTP_PROXY: "+httpProxy);
+    }
+    var httpsProxy = EnvironmentVariable("https_proxy");
+    if(!string.IsNullOrEmpty(httpsProxy)) {
+        Information("Using HTTPS_PROXY: "+httpsProxy);
+    }
+    var noProxy = EnvironmentVariable("no_proxy");
+    if(!string.IsNullOrEmpty(noProxy)) {
+        Information("Using NO_PROXY: "+noProxy);
+    }
 
     // Update DockerDetails.BuildArguments
     var buildArgs = new string[] {
@@ -73,8 +88,13 @@ public DockerDetails GetDockerDetails()
 
         "IMAGE_NAME="+ret.ImageName,
         "IMAGE_DESC="+ret.ImageDescription,
-        "IMAGE_URL="+ret.ImageUrl
+        "IMAGE_URL="+ret.ImageUrl,
+
+        "HTTP_PROXY="+httpProxy,
+        "HTTPS_PROXY="+httpsProxy,
+        "NO_PROXY="+noProxy
     };
+
     ret.BuildArguments = buildArgs;
 
     // Tags
