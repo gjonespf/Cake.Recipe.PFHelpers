@@ -1,3 +1,9 @@
+Setup<ProjectProperties>(context =>
+{
+    var projectProps = LoadProjectProperties(MakeAbsolute(Directory(".")));
+    return projectProps;
+});
+
 public static ProjectProperties ProjectProps;
 
 // TASKS
