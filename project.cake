@@ -1,5 +1,5 @@
 
-
+// TODO: Should be done in setup.cake pulling from properties.json? Or same here?
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
                             sourceDirectoryPath: "./",
@@ -10,9 +10,9 @@ BuildParameters.SetParameters(context: Context,
                             shouldPostToMicrosoftTeams: true,
                             shouldRunGitVersion: true
                             );
-
-BuildParameters.IsDotNetCoreBuild = false;
-BuildParameters.IsNuGetBuild = true;
+// TODO: Pull these in via detection too or in properties.json
+// BuildParameters.IsDotNetCoreBuild = false;
+// BuildParameters.IsNuGetBuild = true;
 
 BuildParameters.Tasks.DefaultTask
     .IsDependentOn("Build");
