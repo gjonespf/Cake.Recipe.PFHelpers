@@ -1,4 +1,17 @@
+Task("BuildPackage")
+    .IsDependentOn("Build")
+    .IsDependentOn("Package")
+    .Does(() =>
+{
+});
 
+Task("BuildPackagePublish")
+    .IsDependentOn("Build")
+    .IsDependentOn("Package")
+    .IsDependentOn("Publish")
+    .Does(() => {
+	});
+    
 // TODO: Repurpose, as we're going to use the Cake.Recipe default ./BuildArtifacts path instead...
 Task("Publish-Artifacts")
     .IsDependentOn("PFInit")
@@ -14,7 +27,7 @@ Task("Publish-Artifacts")
             //     CopyFile(filePath, BuildArtifactPath+"/"+filePath.GetFilename());
             // }
         } else {
-            Error("No artifact path set!");
+            Error("No artifact path set!  Cannot publish artifacts!");
         }
     });
 
