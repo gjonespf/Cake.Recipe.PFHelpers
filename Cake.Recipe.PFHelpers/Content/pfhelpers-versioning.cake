@@ -117,6 +117,16 @@ public DirectoryPath GetVersioningBaseDirectory()
 Task("Create-SolutionInfoVersion")
 	.Does(() => {
         var baseDir = GetVersioningBaseDirectory();
+        if(BuildParameters.SolutionFilePath != null) {
+            Information("Solution file path: "+BuildParameters.SolutionFilePath);
+        } else {
+            Information("Solution file path is null: "+BuildParameters.SolutionFilePath);
+        }
+        if(BuildParameters.SourceDirectoryPath != null) {
+            Information("Source directory path: "+BuildParameters.SourceDirectoryPath);
+        } else {
+            Information("Source directory path is null: "+BuildParameters.SourceDirectoryPath);
+        }
 
         if(baseDir != null && DirectoryExists(baseDir)) {
             Information("Checking versioning on solution path: "+baseDir);
