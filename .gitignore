@@ -58,8 +58,11 @@ application/cache/*
 npm-debug.*
 
 #Cake
-tools/*
+# Cake
+tools/**
 !tools/packages.config
+!tools/*.cake 
+
 go.selfupdate.ps1
 buildparameters.json
 # Distrib files

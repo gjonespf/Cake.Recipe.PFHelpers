@@ -112,13 +112,24 @@ public DirectoryPath GetVersioningBaseDirectory()
 }
 
 // TODO: This doesn't seem to be created early enough for first builds to work, need to look into this
+//.WithCriteria(BuildParameters.SourceDirectoryPath != null)
+// TODO: Unsure why, but BuildParameters.SourceDirectoryPath seems to be null here, possibly due to being too early in process
 Task("Create-SolutionInfoVersion")
-    .WithCriteria(BuildParameters.SourceDirectoryPath != null)
 	.Does(() => {
         var baseDir = GetVersioningBaseDirectory();
+        if(BuildParameters.SolutionFilePath != null) {
+            Information("Solution file path: "+BuildParameters.SolutionFilePath);
+        } else {
+            Information("Solution file path is null: "+BuildParameters.SolutionFilePath);
+        }
+        if(BuildParameters.SourceDirectoryPath != null) {
+            Information("Source directory path: "+BuildParameters.SourceDirectoryPath);
+        } else {
+            Information("Source directory path is null: "+BuildParameters.SourceDirectoryPath);
+        }
 
         if(baseDir != null && DirectoryExists(baseDir)) {
-            Information("Checking solution path: "+baseDir);
+            Information("Checking versioning on solution path: "+baseDir);
             var solutionFilePath = MakeAbsolute(new FilePath(baseDir + "/SolutionInfo.cs"));
             if(!FileExists(solutionFilePath)) {
                 Information("Creating missing SolutionInfo file: "+solutionFilePath);

@@ -21,13 +21,7 @@ pipeline {
                 echo "Using proxy: ${env.HTTP_PROXY}"
                 script {
                     if(fileExists('./pre.ps1')) {
-                        if (isUnix()) {
-                            echo 'Running on Unix...'
-                            sh "pwsh ./pre.ps1 -t \"Init\"" 
-                        } else  {
-                            echo 'Running on Windows...'
-                            bat "powershell -ExecutionPolicy Bypass -Command \"& './pre.ps1' -Target \"Init\"\""
-                        }
+                        executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./pre.ps1 \" ")
                     } else {
                         echo "Skipping prep as no script exists"
                     }
@@ -39,13 +33,7 @@ pipeline {
             {
                 echo 'Initializing...'
                 script {
-                    if (isUnix()) {
-                        echo 'Running on Unix...'
-                        sh "./build.sh -t \"Init\"" 
-                    } else  {
-                        echo 'Running on Windows...'
-                        bat "powershell -ExecutionPolicy Bypass -Command \"& './build.ps1' -Target \"Init\"\""
-                    }
+                    executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./build.ps1 -Target \"Init\" \" ")
                 }
             }
         }
@@ -54,11 +42,7 @@ pipeline {
                 echo "Running #${env.BUILD_ID} on ${env.JENKINS_URL}"
                 echo 'Building...'
                 script {
-                    if (isUnix()) {
-                        sh "./build.sh -t \"Build\"" 
-                    } else  {
-                        bat "powershell -ExecutionPolicy Bypass -Command \"& './build.ps1' -Target \"Build\"\""
-                    }
+                    executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./build.ps1 -Target \"Build\" \" ")
                 }
             }
         }
@@ -66,11 +50,7 @@ pipeline {
             steps {
                 echo 'Packaging...'
                 script {
-                    if (isUnix()) {
-                        sh "./build.sh -t \"Package\"" 
-                    } else  {
-                        bat "powershell -ExecutionPolicy Bypass -Command \"& './build.ps1' -Target \"Package\"\""
-                    }
+                    executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./build.ps1 -Target \"Package\" \" ")
                 }
             }
         }
@@ -78,11 +58,7 @@ pipeline {
             steps {
                 echo 'Testing...'
                 script {
-                    if (isUnix()) {
-                        sh "./build.sh -t \"Test\"" 
-                    } else  {
-                        bat "powershell -ExecutionPolicy Bypass -Command \"& './build.ps1' -Target \"Test\"\""
-                    }
+                    executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./build.ps1 -Target \"Test\" \" ")
                 }
             }
         }
@@ -97,11 +73,7 @@ pipeline {
                 {
                     echo 'Publishing...'
                     script {
-                        if (isUnix()) {
-                            sh "./build.sh -t \"Publish\"" 
-                        } else  {
-                            bat "powershell -ExecutionPolicy Bypass -Command \"& './build.ps1' -Target \"Publish\"\""
-                        }
+                        executeXplat("pwsh -ExecutionPolicy Bypass -Command \"& ./build.ps1 -Target \"Publish\" \" ")
                     }
                 }
             }
