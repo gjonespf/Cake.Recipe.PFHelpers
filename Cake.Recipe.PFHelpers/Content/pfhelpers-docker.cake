@@ -28,12 +28,13 @@ public DockerDetails GetDockerDetails(CustomBuildVersion buildVersion)
 {
     DockerDetails ret = new DockerDetails();
 
-    var imageName = "UNKNOWN";
-    var imageDesc = "UNKNOWN";
-    var imageUrl = "UNKNOWN";
     var repoDir = DirectoryPath.FromString(".");
     var buildNumber = "UNKNOWN";
     var semVer = "UNKNOWN";
+
+    ret.ImageName = "UNKNOWN";
+    ret.ImageDescription = "UNKNOWN";
+    ret.ImageUrl = "UNKNOWN";
 
     if(buildVersion == null) {
         throw new ApplicationException("PFBuildVersion is missing in GetDockerDetails");
@@ -199,10 +200,6 @@ Task("Publish-PFDocker")
     });
 
 Task("Publish-PFDockerReleaseInformation")
-    // .IsDependentOn("PFInit")
-    // .IsDependentOn("Generate-Version-File-PF")
-	// .IsDependentOn("Publish-Artifacts")
-	//.Does(() => {
     .WithCriteria<CustomBuildVersion>((context, data) => data != null)
     .Does<CustomBuildVersion>(pfbuild => //make sure you use the right type parameter here
     {
