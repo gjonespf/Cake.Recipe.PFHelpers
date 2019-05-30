@@ -47,28 +47,38 @@ public void SaveBuildVersion(CustomBuildVersion buildVer)
     }
 }
 
+// TODO: Remove/replace with <PFBuildVersion> 
 public CustomBuildVersion GetPFBuildVersion() 
 {
     CustomBuildVersion PFBuildVersion;
-    var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
-    var versionFilePath = $"./{BuildVersionFileName}";
-
     var vers = new CustomBuildVersion() {
         Version = BuildParameters.Version.Version,
         SemVersion = BuildParameters.Version.SemVersion,
-        MajorMinorPatch = props["GitVersion_MajorMinorPatch"],
-        Major = props["GitVersion_Major"],
-        Minor = props["GitVersion_Minor"],
-        Patch = props["GitVersion_Patch"],
+        MajorMinorPatch = "0.0.0",
+        Major = "0",
+        Minor = "0",
+        Patch = "0",
         Milestone = BuildParameters.Version.Milestone,
         InformationalVersion = BuildParameters.Version.InformationalVersion,
         FullSemVersion = BuildParameters.Version.FullSemVersion,
-        BranchName = props["GitVersion_BranchName"],
-        CommitHash = props["GitVersion_Sha"],
-        CommitDate = props["GitVersion_CommitDate"],
+        BranchName = "UNKNOWN",
+        CommitHash = "UNKNOWN",
+        CommitDate = "UNKNOWN",
         BuildId = EnvironmentVariable("BUILD_NUMBER"),
         BuildUrl = EnvironmentVariable("BUILD_URL"),
     };
+    // Pull from this if it exists
+    if(FileExists($"./{GitVersionPropertiesFileName}")) {
+        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+        vers.MajorMinorPatch = props["GitVersion_MajorMinorPatch"];
+        vers.Major = props["GitVersion_Major"];
+        vers.Minor = props["GitVersion_Minor"];
+        vers.Patch = props["GitVersion_Patch"];
+        vers.BranchName = props["GitVersion_BranchName"];
+        vers.CommitHash = props["GitVersion_Sha"];
+        vers.CommitDate = props["GitVersion_CommitDate"];
+    }
+    var versionFilePath = $"./{BuildVersionFileName}";
     PFBuildVersion = vers;
     SaveBuildVersion(vers);
 

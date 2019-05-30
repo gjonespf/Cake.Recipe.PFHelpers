@@ -8,8 +8,12 @@ Task("Purge")
 
     ForceDeleteDirectory("./.git/gitversion_cache/");
     ForceDeleteDirectory("./BuildArtifacts/");
-    DeleteFiles("./tools/packages.config.md5sum");
-    DeleteFiles("./gitversion.properties");
+    if(FileExists("./tools/packages.config.md5sum")) {
+        DeleteFiles("./tools/packages.config.md5sum");
+    }
+    if(FileExists("./gitversion.properties")) {
+        DeleteFiles("./gitversion.properties");
+    }
     DeleteFiles("./*version.json");
 
     // rm -Recurse tools/*
