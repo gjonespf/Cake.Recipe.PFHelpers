@@ -11,7 +11,7 @@ Task("BuildPackagePublish")
     .IsDependentOn("Publish")
     .Does(() => {
 	});
-    
+
 // TODO: Repurpose, as we're going to use the Cake.Recipe default ./BuildArtifacts path instead...
 Task("Publish-Artifacts")
     .IsDependentOn("PFInit")
@@ -38,6 +38,7 @@ Task("Publish-Local")
         // Copy packaging files (nupkg) to local dirs if env set
     });
 
+// TODO: Split to nuget
 // PF Publishing
 Task("Publish-LocalNugetCache")
     .Does(() => {
@@ -69,31 +70,6 @@ Task("Publish-LocalNuget")
 
         if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
             throw new ApplicationException("Environmental variables 'LocalNugetServerUrl' and 'LocalNugetApiKey' must be set to use this");
-        }
-
-        foreach(var nupkgFile in nupkgFiles)
-        {
-            // Push the package.
-            NuGetPush(nupkgFile, new NuGetPushSettings {
-                Source = SourceUrl,
-                ApiKey = ApiKey
-            });
-        }
-    });
-
-// TODO: RequireAddin and env vars override
-Task("Publish-LocalOctopus")
-    .Does(() => {
-        var SourceUrl = EnvironmentVariable("OctoServerPushUrl");
-        var ApiKey = EnvironmentVariable("OCTOAPIKEY");
-        var DestinationName = "Local Octopus";
-        var keyExists = !string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT";
-        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {keyExists}");
-
-        var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
-
-        if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
-            throw new ApplicationException("Environmental variables 'OctoServerPushUrl' and 'OCTOAPIKEY' must be set to use this");
         }
 
         foreach(var nupkgFile in nupkgFiles)
