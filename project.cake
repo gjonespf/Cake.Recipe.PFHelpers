@@ -39,7 +39,7 @@ Task("Init")
     });
 
 BuildParameters.Tasks.CleanTask
-    .IsDependentOn("Generate-Version-File-PF")
+    // .IsDependentOn("Generate-Version-File-PF")
     .Does(() => {
     });
 
