@@ -125,7 +125,7 @@ function Clear-GitversionCache() {
     }
 }
 
-function Invoke-PreauthSetup() {
+function Invoke-PreauthSetup([switch]$FetchBranches) {
     # TODO: Git fetch for gitversion issues
     # TODO: Module?
     try
@@ -153,8 +153,11 @@ Write-Host "password=$($env:GITKEY)"
             Write-Warning "No gituser found, pre fetch will fail if repo is private"
         }
         Remove-GitLocalBranches -CurrentBranch $currentBranch
-        Invoke-GitFetchGitflowBranches -CurrentBranch $currentBranch
-        Invoke-GitFetchRemoteBranches -CurrentBranch $currentBranch
+        if($FetchBranches)
+        {
+            Invoke-GitFetchGitflowBranches -CurrentBranch $currentBranch
+            Invoke-GitFetchRemoteBranches -CurrentBranch $currentBranch
+        }
 
         Write-Host "Current branches:"
         git branch --all
@@ -168,7 +171,7 @@ Write-Host "password=$($env:GITKEY)"
             git config --local --unset-all credential.helper
         }
         if(Test-Path ./preauth.ps1) {
-            # rm ./preauth.ps1
+            rm ./preauth.ps1
         }
     }
 }
@@ -185,4 +188,10 @@ Install-PrePrerequisites
 Install-NugetCaching
 Clear-GitversionCache
 Install-DotnetBuildTools
-Invoke-PreauthSetup
+
+$isVSTSAgent = $env:VSTS_AGENT
+$isJenkinsNode = $env:JENKINS_HOME
+
+if(!($isVSTSAgent) -and !($isJenkinsNode)) {
+    Invoke-PreauthSetup -FetchBranches:($isJenkinsNode)
+}
