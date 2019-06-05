@@ -46,26 +46,26 @@ pipeline {
         stage('Init') {
             steps {
                 echo 'Initializing...'
-                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.ps1 -Target \"Init\" "
+                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.dntool.ps1 -Target \"Init\" "
             }
         }
         stage('Build') {
             steps {
                 echo "Running #${env.BUILD_ID} on ${env.JENKINS_URL}"
                 echo 'Building...'
-                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.ps1 -Target \"Build\" "
+                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.dntool.ps1 -Target \"Build\" "
             }
         }
         stage('Package') {
             steps {
                 echo 'Packaging...'
-                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.ps1 -Target \"Package\" "
+                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.dntool.ps1 -Target \"Package\" "
             }
         }
         stage('Test'){
             steps {
                 echo 'Testing...'
-                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.ps1 -Target \"Test\" "
+                executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.dntool.ps1 -Target \"Test\" "
             }
         }
         stage('Publish') {
@@ -80,7 +80,7 @@ pipeline {
                     ]) 
                 {
                     echo 'Publishing...'
-                    executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.ps1 -Target \"Publish\" "
+                    executeXplat "pwsh -NonInteractive -NoProfile -ExecutionPolicy Bypass ./build.dntool.ps1 -Target \"Publish\" "
                 }
             }
         }
