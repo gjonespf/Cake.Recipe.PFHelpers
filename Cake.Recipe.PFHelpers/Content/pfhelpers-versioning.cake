@@ -104,7 +104,10 @@ Task("Generate-Version-File-PF")
 
 Task("Create-SolutionInfoVersion")
 	.Does(() => {
-        var solutionFilePath = MakeAbsolute(new FilePath(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs"));
+        var solutionFilePath = MakeAbsolute(new FilePath("./SolutionInfo.cs"));
+        if(BuildParameters.SourceDirectoryPath != null) {
+            solutionFilePath = MakeAbsolute(new FilePath(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs"));
+        }
         if(!FileExists(solutionFilePath)) {
             Information("Creating missing SolutionInfo file: "+solutionFilePath);
             System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
