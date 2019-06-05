@@ -162,7 +162,7 @@ Task("Package-Docker")
     });
 
 Task("Publish-PFDocker")
-    .IsDependentOn("PFInit")
+    //.IsDependentOn("PFInit")
     .IsDependentOn("Generate-Version-File-PF")
     .Does<DockerDetails>((context, dockerDetails) => {
         //var dockerDetails = GetDockerDetails(data);
