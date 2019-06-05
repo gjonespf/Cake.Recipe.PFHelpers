@@ -6,7 +6,7 @@ queue:
 
 variables:
   - group: "PFDev KeyVault Variables"
-  - group: "PowerConnect Jenkins Variables"
+  - group: "PowerFarming.Build Variables"
 
 steps:
 - task: PowerShell@2
