@@ -1,12 +1,17 @@
 
-var notifyTeamsHook = ProjectProps != null ? ProjectProps.TeamsWebHook : null;
+//var notifyTeamsHook = ProjectProps != null ? ProjectProps.TeamsWebHook : null;
 
 Task("PublishNotify-NotifyTeams")
     .IsDependentOn("PFInit")    
-    .WithCriteria(!string.IsNullOrEmpty(notifyTeamsHook))
-	.Does(() => {
+    //.WithCriteria(!string.IsNullOrEmpty(notifyTeamsHook))
+	.Does<ProjectProperties>((context, data) => {
+        var ProjectProps = data;
         if(ProjectProps == null) {
             Information("Null props");
+            return;
+        }
+        if(string.IsNullOrEmpty(ProjectProps.TeamsWebHook)) {
+            Information("Teams web hook not set");
             return;
         }
         Information("TASK: PublishNotify Teams");

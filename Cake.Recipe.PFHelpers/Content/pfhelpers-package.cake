@@ -2,8 +2,9 @@
 Task("Package-GenerateReleaseVersion")
     .IsDependentOn("PFInit")
     .IsDependentOn("Generate-Version-File-PF")
-    .Does(() => {
-        var rel = GenerateReleaseVersion();
+    .Does<PFCustomBuildParams>((context, data) => {
+        var rel = GenerateReleaseVersion(data);
+        var BuildArtifactPath = data != null ? data.BuildArtifactPath : null;
         if(rel != null) {
             SaveReleaseVersion(rel);
         }

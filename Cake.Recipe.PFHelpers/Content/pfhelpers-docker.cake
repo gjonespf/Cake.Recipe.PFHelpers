@@ -1,12 +1,3 @@
-
-// TODO: Need a way of pulling versioning details into this somehow...
-// Setup<DockerDetails>(context =>
-// {
-//     // FIXME
-//     var dockerDetails = GetDockerDetails(null);
-//     return dockerDetails;
-// });
-
 public class DockerDetails
 {
     public string ImageName { get; set; }
@@ -21,35 +12,38 @@ public class DockerDetails
     public string DefaultLocal { get;set; }
     public string[] RemoteTags { get; set; }
     public string DefaultRemote { get;set; }
-    public string DefaultRepo { get;set; }
 }
 
-public DockerDetails GetDockerDetails(CustomBuildVersion buildVersion)
+public DockerDetails GetDockerDetails(PFCustomBuildParams parms)
 {
     DockerDetails ret = new DockerDetails();
+    if(parms == null) {
+        throw new ApplicationException("Null parms GetDockerDetails");
+    }
+    var BuildNumber = parms.BuildNumber;
+    var props = parms.ProjectProps;
+    var PFBuildVersion = parms.PFBuildVersion;
 
+    var imageName = "UNKNOWN";
+    var imageDesc = "UNKNOWN";
+    var imageUrl = "UNKNOWN";
     var repoDir = DirectoryPath.FromString(".");
     var buildNumber = "UNKNOWN";
     var semVer = "UNKNOWN";
 
-    ret.ImageName = "UNKNOWN";
-    ret.ImageDescription = "UNKNOWN";
-    ret.ImageUrl = "UNKNOWN";
+    // if(PFBuildVersion == null) {
+    //     throw new ApplicationException("GetDockerDetails - PFBuildVersion is missing");
+    // }
 
-    if(buildVersion == null) {
-        throw new ApplicationException("PFBuildVersion is missing in GetDockerDetails");
-    }
-
-    ProjectProperties props = LoadProjectProperties();
     if(props == null) {
         throw new ApplicationException("Error loading project properties file, does it exist?");
     }
 
-    if(!string.IsNullOrEmpty(buildVersion.BuildNumber)) {
-        buildNumber = buildVersion.BuildNumber;
+    if(!string.IsNullOrEmpty(BuildNumber)) {
+        buildNumber = BuildNumber;
     }
-    if(!string.IsNullOrEmpty(buildVersion.SemVersion)) {
-        semVer = buildVersion.SemVersion;
+    if(PFBuildVersion != null && !string.IsNullOrEmpty(PFBuildVersion.SemVersion)) {
+        semVer = PFBuildVersion.SemVersion;
     }
 
     var tip = GitLogTip(repoDir);
@@ -70,20 +64,6 @@ public DockerDetails GetDockerDetails(CustomBuildVersion buildVersion)
         ret.ImageUrl = props.ProjectUrl;
     }
     ret.GitUrl = currentBranch.Remotes.First().Url;
-    
-    // Cache build args
-    var httpProxy = EnvironmentVariable("http_proxy");
-    if(!string.IsNullOrEmpty(httpProxy)) {
-        Information("Using HTTP_PROXY: "+httpProxy);
-    }
-    var httpsProxy = EnvironmentVariable("https_proxy");
-    if(!string.IsNullOrEmpty(httpsProxy)) {
-        Information("Using HTTPS_PROXY: "+httpsProxy);
-    }
-    var noProxy = EnvironmentVariable("no_proxy");
-    if(!string.IsNullOrEmpty(noProxy)) {
-        Information("Using NO_PROXY: "+noProxy);
-    }
 
     // Update DockerDetails.BuildArguments
     var buildArgs = new string[] {
@@ -98,13 +78,8 @@ public DockerDetails GetDockerDetails(CustomBuildVersion buildVersion)
 
         "IMAGE_NAME="+ret.ImageName,
         "IMAGE_DESC="+ret.ImageDescription,
-        "IMAGE_URL="+ret.ImageUrl,
-
-        "HTTP_PROXY="+httpProxy,
-        "HTTPS_PROXY="+httpsProxy,
-        "NO_PROXY="+noProxy
+        "IMAGE_URL="+ret.ImageUrl
     };
-
     ret.BuildArguments = buildArgs;
 
     // Tags
@@ -140,12 +115,16 @@ private string Information(DockerDetails deets)
     return b.ToString();
 }
 
+Setup<DockerDetails>(context => 
+{
+    Verbose("Setup - DockerDetails");
+    PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
+    return GetDockerDetails(parms);
+});
+
 Task("Build-Docker")
-    .IsDependentOn("PFInit")
-	.WithCriteria<CustomBuildVersion>((context, data) => data != null)
-    .Does<CustomBuildVersion>(pfbuild =>
-    {
-        var dockerDetails = GetDockerDetails(pfbuild);
+    .Does<DockerDetails>((context, dockerDetails) => {
+
         Information("Docker build with args:");
         Information(dockerDetails);
 
@@ -168,28 +147,25 @@ Task("Build-Docker")
 Task("Package-Docker")
     .IsDependentOn("PFInit")
     .IsDependentOn("Generate-Version-File-PF")
-	.WithCriteria<CustomBuildVersion>((context, data) => data != null)
-    .Does<CustomBuildVersion>(pfbuild =>
-    {
+    .Does<DockerDetails>((context, dockerDetails) => {
+
         Information("Docker build with args:");
-        var dockerDetails = GetDockerDetails(pfbuild);
         Information(dockerDetails);
         var sourceTag = dockerDetails.LocalTags.First();
+
         // Simply apply remote tags
-         foreach(var tagRef in dockerDetails.RemoteTags)
-         {
-             Information("Packaging tag: "+tagRef);
-             DockerTag(sourceTag, tagRef);
-         }
+        foreach(var tagRef in dockerDetails.RemoteTags)
+        {
+            Information("Packaging tag: "+tagRef);
+            DockerTag(sourceTag, tagRef);
+        }
     });
 
 Task("Publish-PFDocker")
     .IsDependentOn("PFInit")
     .IsDependentOn("Generate-Version-File-PF")
-	.WithCriteria<CustomBuildVersion>((context, data) => data != null)
-    .Does<CustomBuildVersion>(pfbuild =>
-    {
-        var dockerDetails = GetDockerDetails(pfbuild);
+    .Does<DockerDetails>((context, dockerDetails) => {
+        //var dockerDetails = GetDockerDetails(data);
         foreach(var tagRef in dockerDetails.RemoteTags)
         {
             var dockerPushSettings = new DockerImagePushSettings() {
@@ -198,44 +174,3 @@ Task("Publish-PFDocker")
             DockerPush(dockerPushSettings, tagRef);
         }
     });
-
-Task("Publish-PFDockerReleaseInformation")
-    .WithCriteria<CustomBuildVersion>((context, data) => data != null)
-    .Does<CustomBuildVersion>(pfbuild => //make sure you use the right type parameter here
-    {
-        if(pfbuild == null) {
-            throw new ApplicationException("PFBuildVersion param is null");
-        }
-
-        var relVer = new ReleaseVersion() {
-            PackagePath = "UNKNOWN",
-            PackageName = "UNKNOWN",
-            PackageRepo = "UNKNOWN",
-            Version = BuildParameters.Version.Version,
-            SemVersion = BuildParameters.Version.SemVersion,
-            BranchName = pfbuild.BranchName,
-            CommitHash = pfbuild.CommitHash,
-            CommitDate = pfbuild.CommitDate,
-        };
-        var props = LoadProjectProperties();
-        //var propertiesFilePath = "./properties.json";
-        //if(FileExists(propertiesFilePath)) {
-        if(props != null) {
-            // TODO: Rename props?
-            relVer.PackageName = props.ProjectName;
-            relVer.PackageRepo = props.DefaultRemote;
-            relVer.PackagePath = $"docker://{props.DefaultRemote}/{props.DefaultUser}/{props.ProjectCodeName}:{relVer.SemVersion}";
-        } else {
-            throw new ApplicationException("properties.json file is missing or empty");
-        }
-
-        SaveReleaseVersion(relVer);
-
-        if(BuildArtifactPath != null) {
-            Information("Copying versioning to build artifact path: "+BuildArtifactPath);
-            EnsureDirectoryExists(BuildArtifactPath);
-            CopyFile("./ReleaseVersion.json", BuildArtifactPath+"/ReleaseVersion.json");
-        } else {
-            Error("No artifact path set!");
-        }
-	});

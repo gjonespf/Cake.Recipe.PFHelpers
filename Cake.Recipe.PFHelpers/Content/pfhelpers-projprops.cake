@@ -1,51 +1,9 @@
-Setup<ProjectProperties>(context =>
-{
-    var projectProps = LoadProjectProperties(MakeAbsolute(Directory(".")));
-    return projectProps;
-});
+#r Newtonsoft.Json
+using Newtonsoft.Json;
 
-public static ProjectProperties ProjectProps;
+//public static ProjectProperties ProjectProps;
 
-// TASKS
-var initDone = 
-            !string.IsNullOrEmpty("BUILD_NUMBER") 
-            && BuildArtifactPath != null 
-            && BuildNumber != null
-            && ProjectProps != null;
-Task("PFInit")
-    .WithCriteria(!initDone)
-    .IsDependentOn("Create-SolutionInfoVersion")
-    .Does(() => {
-        // Ensure build number & output directory for artifacts
-        var buildNum = EnvironmentVariable("BUILD_NUMBER");
-        if(string.IsNullOrEmpty(buildNum) ||
-            buildNum.StartsWith("HASH-")) {
-            // Use current commit
-            var lastCommit = GitLogTip(".");
-            var commitHash = lastCommit.Sha;
-            buildNum = "HASH-"+commitHash;
-        }
 
-        var artifactPath = MakeAbsolute(Directory("./BuildArtifacts/")).FullPath;
-        Information("Artifact path set to: "+artifactPath);
-        BuildArtifactPath = artifactPath;
-        BuildNumber = buildNum;
-        EnsureDirectoryExists(BuildArtifactPath);
-        ProjectProps = LoadProjectProperties(MakeAbsolute(Directory(".")));
-    });
-
-Task("PFInit-Clean")
-    .Does(() => {
-        if(!string.IsNullOrEmpty(BuildArtifactPath)) {
-            if (DirectoryExists(BuildArtifactPath))
-            {
-                // Param to force clean, not sure it's currently needed
-                //ForceDeleteDirectory(BuildArtifactPath);
-            }
-            EnsureDirectoryExists(BuildArtifactPath);
-        }
-    });
-    
 public class ProjectProperties
 {
     public string ProjectName { get; set; }   
@@ -81,4 +39,9 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
     }
     return props;
 }
+
+Setup<ProjectProperties>(setupContext => 
+{
+    return LoadProjectProperties(null);
+});
 
