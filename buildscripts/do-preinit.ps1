@@ -99,7 +99,10 @@ function Install-DotnetBuildToolsOptional() {
 function Install-NugetCaching() {
     # Enable nuget caching
     if($env:HTTP_PROXY) {
-        $nuget = Get-Command nuget
+        $nuget = Get-Command nuget -ErrorAction SilentlyContinue
+        if(!($nuget) -and (Test-Path "./tools/nuget.exe")) {
+            $nuget = Resolve-Path  "./tools/nuget.exe"
+        }
         if($nuget)
         {
             Write-Host "Setting Nuget proxy to '$env:HTTP_PROXY'"
