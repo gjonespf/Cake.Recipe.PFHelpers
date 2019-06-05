@@ -103,11 +103,12 @@ Task("Generate-Version-File-PF")
     });
 
 Task("Create-SolutionInfoVersion")
-	.Does(() => {
-        var solutionFilePath = MakeAbsolute(new FilePath("./SolutionInfo.cs"));
-        if(BuildParameters.SourceDirectoryPath != null) {
-            solutionFilePath = MakeAbsolute(new FilePath(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs"));
-        }
+    .Does<PFCustomBuildParams>((context, parms) => {
+        // var solutionFilePath = MakeAbsolute(File("./SolutionInfo.cs"));
+        // if(BuildParameters.SourceDirectoryPath != null && !string.IsNullOrEmpty(BuildParameters.SourceDirectoryPath)) {
+        //     solutionFilePath = MakeAbsolute(File(string.Format("{0}/SolutionInfo.cs", BuildParameters.SourceDirectoryPath);
+        // }
+        var solutionFilePath = BuildParameters.SourceDirectoryPath.CombineWithFilePath("SolutionInfo.cs");
         if(!FileExists(solutionFilePath)) {
             Information("Creating missing SolutionInfo file: "+solutionFilePath);
             System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
