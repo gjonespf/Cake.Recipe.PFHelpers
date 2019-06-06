@@ -26,7 +26,10 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
     if(rootPath == null)
         rootPath = Directory(".");
         
-    ProjectProperties props = null;
+    // TODO: Some defaults from what we know?
+    ProjectProperties props = new ProjectProperties(){
+
+    };
     var propertiesFilePath = $"{rootPath.FullPath}/{ProjectPropertiesFileName}";
     if(FileExists(propertiesFilePath)) {
         var jsonData = String.Join(System.Environment.NewLine, System.IO.File.ReadAllLines(propertiesFilePath));
