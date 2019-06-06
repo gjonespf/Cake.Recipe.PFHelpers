@@ -1,3 +1,4 @@
+#load "common.cake"
 
 // TODO: Should be done in setup.cake pulling from properties.json? Or same here?
 BuildParameters.SetParameters(context: Context,
@@ -21,13 +22,6 @@ BuildParameters.Tasks.DefaultTask
 // {
 // });
 
-// TODO: Should be baked in
-// TODO: Should be run from PFInit / how PFInit is run?
-Task("ConfigureFromProjectParametersFile")
-    .WithCriteria<ProjectProperties>((context, data) => !string.IsNullOrEmpty(data.ProjectName))
-    .Does<ProjectProperties>(data => {
-        Information("Setting properties based on ProjectProperties file: ", data.ProjectName);
-});
 
 Task("Init")
     .IsDependentOn("ConfigureFromProjectParametersFile")
