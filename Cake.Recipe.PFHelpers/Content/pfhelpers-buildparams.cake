@@ -47,17 +47,13 @@ Setup<PFCustomBuildParams>(context =>
 });
 
 Task("PFInit")
+    .IsDependentOn("ConfigureProjectProperties")
+    .IsDependentOn("ConfigureCustomBuildVersion")
     .Does<PFCustomBuildParams>((context, parms) => {
-        // if(parms.BuildArtifactPath != null) {
-        //     Information("Copying versioning to build artifact path: "+parms.BuildArtifactPath);
-        //     EnsureDirectoryExists(parms.BuildArtifactPath);
-        //     CopyFile(versionFilePath, parms.BuildArtifactPath+$"/{BuildVersionFileName}");
-        // } else {
-        //     Error("No artifact path set!");
-        // }
     });
 
 Task("PFInit-Clean")
+    .IsDependentOn("PFInit")
     .Does<PFCustomBuildParams>((context, parms) => {
         var BuildArtifactPath = parms.BuildArtifactPath;
 

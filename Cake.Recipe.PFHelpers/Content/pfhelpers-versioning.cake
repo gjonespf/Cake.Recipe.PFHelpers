@@ -64,14 +64,6 @@ public CustomBuildVersion GenerateCustomBuildVersion()
     // Fall back on env vars if exists
     SaveBuildVersion(vers);
 
-    // if(parms.BuildArtifactPath != null) {
-    //     Information("Copying versioning to build artifact path: "+parms.BuildArtifactPath);
-    //     EnsureDirectoryExists(parms.BuildArtifactPath);
-    //     CopyFile(versionFilePath, parms.BuildArtifactPath+$"/{BuildVersionFileName}");
-    // } else {
-    //     Error("No artifact path set!");
-    // }
-
     return vers;
 }
 
@@ -90,7 +82,12 @@ public void SaveBuildVersion(CustomBuildVersion buildVer)
     }
 }
 
+Task("ConfigureCustomBuildVersion")
+    .Does<CustomBuildVersion>((context, vers) => {
+    });
+
 Task("Generate-Version-File-PF")
+    .IsDependentOn("PFInit")
     .Does<PFCustomBuildParams>((context, parms) => {
         if(parms.BuildArtifactPath != null) {
             var versionFilePath = $"./{BuildVersionFileName}";
@@ -103,6 +100,7 @@ Task("Generate-Version-File-PF")
     });
 
 Task("Create-SolutionInfoVersion")
+    .IsDependentOn("PFInit")
     .Does<PFCustomBuildParams>((context, parms) => {
         // var solutionFilePath = MakeAbsolute(File("./SolutionInfo.cs"));
         // if(BuildParameters.SourceDirectoryPath != null && !string.IsNullOrEmpty(BuildParameters.SourceDirectoryPath)) {

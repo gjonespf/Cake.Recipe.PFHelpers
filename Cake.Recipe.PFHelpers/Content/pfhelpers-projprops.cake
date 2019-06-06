@@ -1,9 +1,6 @@
 #r Newtonsoft.Json
 using Newtonsoft.Json;
 
-//public static ProjectProperties ProjectProps;
-
-
 public class ProjectProperties
 {
     public string ProjectName { get; set; }   
@@ -42,6 +39,14 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
 
 Setup<ProjectProperties>(setupContext => 
 {
+    Verbose("Setup - ProjectProperties");
     return LoadProjectProperties(null);
+});
+
+
+Task("ConfigureProjectProperties")
+    .Does<ProjectProperties>(props => {
+
+        // Load from project.json file if available
 });
 
