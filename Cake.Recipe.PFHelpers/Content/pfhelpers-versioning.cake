@@ -101,7 +101,7 @@ Task("Generate-Version-File-PF")
 
 Task("Create-SolutionInfoVersion")
     .IsDependentOn("PFInit")
-    .Does<PFCustomBuildParams>((context, parms) => {
+    .Does(() => {
         // var solutionFilePath = MakeAbsolute(File("./SolutionInfo.cs"));
         // if(BuildParameters.SourceDirectoryPath != null && !string.IsNullOrEmpty(BuildParameters.SourceDirectoryPath)) {
         //     solutionFilePath = MakeAbsolute(File(string.Format("{0}/SolutionInfo.cs", BuildParameters.SourceDirectoryPath);
