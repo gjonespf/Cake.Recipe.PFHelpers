@@ -27,6 +27,9 @@ if(!($env:PATH -match ".dotnet") -and $IsLinux) {
     }
 }
 
+# Until we can get this working
+$env:CAKE_NUGET_USEINPROCESSCLIENT=false
+
 if(Get-Command "dotnet-cake" -ErrorAction SilentlyContinue) {
     dotnet-cake $Script --target=$Target
 } else {
