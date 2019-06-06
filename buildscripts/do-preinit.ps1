@@ -78,9 +78,13 @@ function Install-DotnetBuildTools() {
     Write-Host "Using PATH: $($env:PATH)"
 
     # Minimum cake versions, should be handled by cake install above...
-    $cakeVersion = [Version](dotnet-cake --version)
-    if($cakeVersion -lt "0.33.0") {
-        dotnet tool update Cake.Tool --global
+    if(Get-Command "dotnet-cake" -ErrorAction SilentlyContinue) {
+        $cakeVersion = [Version](dotnet-cake --version)
+        if($cakeVersion -lt "0.33.0") {
+            dotnet tool update Cake.Tool --global
+        }
+    } else {
+        Write-Warning "dotnet-cake could not be run to check version for some reason, please check scripts"
     }
 
     $gitverVersion = (dotnet-gitversion /version)
@@ -309,4 +313,6 @@ if(!($isVSTSNode) -and !($isJenkinsNode)) {
 }
 
 Invoke-NugetSourcesSetup
-Invoke-CakeBootstrap
+
+# Nuget auth errors, ignore for now
+# Invoke-CakeBootstrap
