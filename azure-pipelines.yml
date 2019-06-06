@@ -3,8 +3,10 @@ trigger:
   branches:
     include:
     - master
-    - develop
+    #- develop
     - releases/*
+    - support/*
+    - hotfix/*
 
 queue:
   name: devinf
