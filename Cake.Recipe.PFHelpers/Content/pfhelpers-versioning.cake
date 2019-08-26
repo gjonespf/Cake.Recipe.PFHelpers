@@ -22,8 +22,13 @@ public class CustomBuildVersion
 
 Setup<CustomBuildVersion>(context => 
 {
-    Verbose("Setup - CustomBuildVersion");
-    return GenerateCustomBuildVersion();
+    try {
+        Verbose("Setup - CustomBuildVersion");
+        return GenerateCustomBuildVersion();
+    } catch(Exception ex) {
+        Error("Exception while setting up DockerDetails: " +ex.Dump());
+        return null;
+    }
 });
 
 public CustomBuildVersion GenerateCustomBuildVersion()

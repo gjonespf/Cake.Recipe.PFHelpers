@@ -117,9 +117,14 @@ private string Information(DockerDetails deets)
 
 Setup<DockerDetails>(context => 
 {
-    Verbose("Setup - DockerDetails");
-    PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
-    return GetDockerDetails(parms);
+    try {
+        Verbose("Setup - DockerDetails");
+        PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
+        return GetDockerDetails(parms);
+    } catch(Exception ex) {
+        Error("Exception while setting up DockerDetails: " +ex.Dump());
+        return null;
+    }
 });
 
 Task("Build-Docker")

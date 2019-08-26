@@ -41,9 +41,14 @@ public PFCustomBuildParams GeneratePFCustomBuildParams(ProjectProperties props, 
 Setup<PFCustomBuildParams>(context => 
 {
     Verbose("Setup - PFCustomBuildParams");
-    ProjectProperties projProps = context.Data.Get<ProjectProperties>();
-    CustomBuildVersion buildVersion = context.Data.Get<CustomBuildVersion>();
-    return GeneratePFCustomBuildParams(projProps, buildVersion);
+    try {
+        ProjectProperties projProps = context.Data.Get<ProjectProperties>();
+        CustomBuildVersion buildVersion = context.Data.Get<CustomBuildVersion>();
+        return GeneratePFCustomBuildParams(projProps, buildVersion);
+    } catch(Exception ex) {
+        Error("Exception while setting up PFCustomBuildParams: " +ex.Dump());
+        return null;
+    }
 });
 
 Task("PFInit")
