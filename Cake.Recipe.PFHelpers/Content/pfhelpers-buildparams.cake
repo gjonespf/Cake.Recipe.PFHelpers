@@ -38,6 +38,7 @@ public PFCustomBuildParams GeneratePFCustomBuildParams(ProjectProperties props, 
     return ret;
 }
 
+// Setup<PFCustomBuildParams>(context =>
 Setup<PFCustomBuildParams>(context => 
 {
     Verbose("PFCustomBuildParams - Setup");

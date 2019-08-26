@@ -3,7 +3,7 @@
 #load pfhelpers-addins.cake
 
 // Params
-#load pfhelpers-projprops.cake
+#load pfhelpers-aprojprops.cake
 #load pfhelpers-versioning.cake
 #load pfhelpers-buildparams.cake
 
