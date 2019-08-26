@@ -23,15 +23,15 @@ public class CustomBuildVersion
 Setup<CustomBuildVersion>(context => 
 {
     try {
-        Verbose("Setup - CustomBuildVersion");
-        return GenerateCustomBuildVersion();
+        Verbose("CustomBuildVersion - Setup");
+        return GenerateCustomBuildVersion(context);
     } catch(Exception ex) {
-        Error("Exception while setting up DockerDetails: " +ex.Dump());
+        Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
         return null;
     }
 });
 
-public CustomBuildVersion GenerateCustomBuildVersion()
+public CustomBuildVersion GenerateCustomBuildVersion(ISetupContext context)
 {
     Information("GenerateCustomBuildVersion");
     var versionFilePath = $"./{BuildVersionFileName}";

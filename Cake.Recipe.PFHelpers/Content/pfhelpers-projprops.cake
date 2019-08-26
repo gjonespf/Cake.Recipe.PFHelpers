@@ -43,10 +43,10 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
 Setup<ProjectProperties>(setupContext => 
 {
     try {
-        Verbose("Setup - ProjectProperties");
+        Verbose("ProjectProperties - Setup");
         return LoadProjectProperties(null);
     } catch(Exception ex) {
-        Error("Exception while setting up ProjectProperties: " +ex.Dump());
+        Error("ProjectProperties - Exception while setting up ProjectProperties: " +ex.Dump());
         return null;
     }
 });

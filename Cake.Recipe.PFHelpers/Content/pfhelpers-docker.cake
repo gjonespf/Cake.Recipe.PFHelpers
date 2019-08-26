@@ -117,15 +117,29 @@ private string Information(DockerDetails deets)
 
 Setup<DockerDetails>(context => 
 {
+    DockerDetails ret = null;
     try {
-        Verbose("Setup - DockerDetails");
-        PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
-        return GetDockerDetails(parms);
+        Verbose("DockerDetails - Setup");
+        if(context != null && context.Data != null)
+        {
+            var parms = context.Data.Get<PFCustomBuildParams>();
+            if(parms == null) {
+                Warning("DockerDetails - Couldn't get PFCustomBuildParams");
+            } else {
+                ret = GetDockerDetails(parms);
+            }
+        } else {
+            Warning("DockerDetails - Couldn't get PFCustomBuildParams - context was null");
+        }
     } catch(Exception ex) {
-        Error("Exception while setting up DockerDetails: " +ex.Dump());
-        return null;
+        Error("DockerDetails - Exception while setting up DockerDetails: " +ex.Dump());
     }
+    return ret;
 });
+
+Task("ConfigureDockerDetails")
+    .Does<DockerDetails>((context, vers) => {
+    });
 
 Task("Build-Docker")
     .Does<DockerDetails>((context, dockerDetails) => {

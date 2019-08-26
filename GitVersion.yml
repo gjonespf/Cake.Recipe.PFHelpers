@@ -1,6 +1,6 @@
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatchTag
-mode: ContinuousDelivery
+mode: ContinuousDeployment
 increment: Inherit
 continuous-delivery-fallback-tag: ci
 tag-prefix: '[vV]'
@@ -44,7 +44,7 @@ branches:
     is-release-branch: false
   pull-request:
     regex: (pull|pull\-requests|pr)[/-]
-    mode: ContinuousDelivery
+    mode: ContinuousDeployment
     tag: PullRequest
     increment: Inherit
     prevent-increment-of-merged-branch-version: false
@@ -54,7 +54,7 @@ branches:
     is-release-branch: false
   hotfix:
     regex: hotfix(es)?[/-]
-    mode: ContinuousDelivery
+    mode: ContinuousDeployment
     tag: beta
     increment: Patch
     prevent-increment-of-merged-branch-version: false
@@ -63,7 +63,7 @@ branches:
     is-release-branch: false
   support:
     regex: support[/-]
-    mode: ContinuousDelivery
+    mode: ContinuousDeployment
     tag: ''
     increment: Patch
     prevent-increment-of-merged-branch-version: true

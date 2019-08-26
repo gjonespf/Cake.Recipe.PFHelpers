@@ -70,11 +70,11 @@ public ReleaseVersion GenerateReleaseVersion(PFCustomBuildParams parms)
 Setup<ReleaseVersion>(context => 
 {
     try {
-        Verbose("Setup - ReleaseVersion");
+        Verbose("ReleaseVersion - Setup");
         PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
         return GenerateReleaseVersion(parms);
     } catch(Exception ex) {
-        Error("Exception while setting up DockerDetails: " +ex.Dump());
+        Error("ReleaseVersion - Exception while setting up ReleaseVersion: " +ex.Dump());
         return null;
     }
 });
