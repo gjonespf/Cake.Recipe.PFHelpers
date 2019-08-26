@@ -38,25 +38,25 @@ public PFCustomBuildParams GeneratePFCustomBuildParams(ProjectProperties props, 
     return ret;
 }
 
-// Setup<PFCustomBuildParams>(context =>
-Setup<PFCustomBuildParams>(context => 
-{
-    Verbose("PFCustomBuildParams - Setup");
-    try {
-        ProjectProperties projProps = context.Data.Get<ProjectProperties>();
-        CustomBuildVersion buildVersion = context.Data.Get<CustomBuildVersion>();
-        return GeneratePFCustomBuildParams(projProps, buildVersion);
-    } catch(Exception ex) {
-        Error("PFCustomBuildParams - Exception while setting up PFCustomBuildParams: " +ex.Dump());
-        return null;
-    }
-});
+// Setup<PFCustomBuildParams>(context => 
+// {
+//     Verbose("PFCustomBuildParams - Setup");
+//     try {
+//         ProjectProperties projProps = context.Data.Get<ProjectProperties>();
+//         CustomBuildVersion buildVersion = context.Data.Get<CustomBuildVersion>();
+//         return GeneratePFCustomBuildParams(projProps, buildVersion);
+//     } catch(Exception ex) {
+//         Error("PFCustomBuildParams - Exception while setting up PFCustomBuildParams: " +ex.Dump());
+//         return null;
+//     }
+// });
 
-Task("PFInit")
-    .IsDependentOn("ConfigureProjectProperties")
-    .IsDependentOn("ConfigureCustomBuildVersion")
-    .Does<PFCustomBuildParams>((context, parms) => {
-    });
+
+// Task("PFInit")
+//     .IsDependentOn("ConfigureProjectProperties")
+//     .IsDependentOn("ConfigureCustomBuildVersion")
+//     .Does<PFCustomBuildParams>((context, parms) => {
+//     });
 
 Task("PFInit-Clean")
     .IsDependentOn("PFInit")

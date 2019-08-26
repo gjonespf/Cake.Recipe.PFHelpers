@@ -40,21 +40,21 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
     return props;
 }
 
-Setup<ProjectProperties>(setupContext => 
-{
-    try {
-        Verbose("ProjectProperties - Setup");
-        return LoadProjectProperties(null);
-    } catch(Exception ex) {
-        Error("ProjectProperties - Exception while setting up ProjectProperties: " +ex.Dump());
-        return null;
-    }
-});
+// Setup<ProjectProperties>(setupContext => 
+// {
+//     try {
+//         Verbose("ProjectProperties - Setup");
+//         return LoadProjectProperties(null);
+//     } catch(Exception ex) {
+//         Error("ProjectProperties - Exception while setting up ProjectProperties: " +ex.Dump());
+//         return null;
+//     }
+// });
 
 
-Task("ConfigureProjectProperties")
-    .Does<ProjectProperties>(props => {
+// Task("ConfigureProjectProperties")
+//     .Does<ProjectProperties>(props => {
 
-        // Load from project.json file if available
-});
+//         // Load from project.json file if available
+// });
 

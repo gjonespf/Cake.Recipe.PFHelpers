@@ -20,16 +20,16 @@ public class CustomBuildVersion
     public string BuildUrl { get; set; }
 }
 
-Setup<CustomBuildVersion>(context => 
-{
-    try {
-        Verbose("CustomBuildVersion - Setup");
-        return GenerateCustomBuildVersion(context);
-    } catch(Exception ex) {
-        Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
-        return null;
-    }
-});
+// Setup<CustomBuildVersion>(context => 
+// {
+//     try {
+//         Verbose("CustomBuildVersion - Setup");
+//         return GenerateCustomBuildVersion(context);
+//     } catch(Exception ex) {
+//         Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
+//         return null;
+//     }
+// });
 
 public CustomBuildVersion GenerateCustomBuildVersion(ISetupContext context)
 {
@@ -87,9 +87,10 @@ public void SaveBuildVersion(CustomBuildVersion buildVer)
     }
 }
 
-Task("ConfigureCustomBuildVersion")
-    .Does<CustomBuildVersion>((context, vers) => {
-    });
+// Task("ConfigureCustomBuildVersion")
+//     .Does<CustomBuildVersion>((context, vers) => {
+//         Verbose("ConfigureCustomBuildVersion");
+//     });
 
 Task("Generate-Version-File-PF")
     .IsDependentOn("PFInit")
