@@ -18,11 +18,6 @@ BuildParameters.SetParameters(context: Context,
 BuildParameters.Tasks.DefaultTask
     .IsDependentOn("Build");
 
-// Setup(context =>
-// {
-// });
-
-
 Task("Init")
     .IsDependentOn("ConfigureFromProjectParametersFile")
     .IsDependentOn("PFInit")
