@@ -11,12 +11,13 @@ Task("BuildPackagePublish")
     .IsDependentOn("Publish")
     .Does(() => {
 	});
-    
+
 // TODO: Repurpose, as we're going to use the Cake.Recipe default ./BuildArtifacts path instead...
 Task("Publish-Artifacts")
     .IsDependentOn("PFInit")
-    .Does(() => {
-        //var sourceArtifactPath = MakeAbsolute(Directory("./BuildArtifacts/"));
+    .Does<PFCustomBuildParams>((context, data) => {
+        var BuildArtifactPath = data != null ? data.BuildArtifactPath : null;
+
         if(!string.IsNullOrEmpty(BuildArtifactPath)) {
             Information("Copying artifacts to build artifact path: "+BuildArtifactPath);
             EnsureDirectoryExists(BuildArtifactPath);
@@ -27,7 +28,7 @@ Task("Publish-Artifacts")
             //     CopyFile(filePath, BuildArtifactPath+"/"+filePath.GetFilename());
             // }
         } else {
-            Error("No artifact path set!  Cannot publish artifacts!");
+            Error("No artifact path set!");
         }
     });
 
@@ -37,6 +38,7 @@ Task("Publish-Local")
         // Copy packaging files (nupkg) to local dirs if env set
     });
 
+// TODO: Split to nuget
 // PF Publishing
 Task("Publish-LocalNugetCache")
     .Does(() => {
@@ -79,4 +81,3 @@ Task("Publish-LocalNuget")
             });
         }
     });
-

@@ -42,18 +42,21 @@ public ReleaseVersion LoadReleaseVersion()
     return relVer;
 }
 
-public ReleaseVersion GenerateReleaseVersion()
+public ReleaseVersion GenerateReleaseVersion(PFCustomBuildParams parms)
 {
     var relVer = new ReleaseVersion() {
             PackagePath = "UNKNOWN",
             PackageName = "UNKNOWN",
             PackageRepo = "UNKNOWN",
             Version = BuildParameters.Version.Version,
-            SemVersion = BuildParameters.Version.SemVersion,
-            BranchName = PFBuildVersion.BranchName,
-            CommitHash = PFBuildVersion.CommitHash,
-            CommitDate = PFBuildVersion.CommitDate,
+            SemVersion = BuildParameters.Version.SemVersion
         };
+    if(parms != null && parms.PFBuildVersion != null)
+    {
+        relVer.BranchName = parms.PFBuildVersion.BranchName;
+        relVer.CommitHash = parms.PFBuildVersion.CommitHash;
+        relVer.CommitDate = parms.PFBuildVersion.CommitDate;
+    }
     var props = LoadProjectProperties();
     // Grab defaults from props?
     if(props != null)
@@ -63,3 +66,15 @@ public ReleaseVersion GenerateReleaseVersion()
     }
     return  relVer;
 }
+
+Setup<ReleaseVersion>(context => 
+{
+    try {
+        Verbose("ReleaseVersion - Setup");
+        PFCustomBuildParams parms = context.Data.Get<PFCustomBuildParams>();
+        return GenerateReleaseVersion(parms);
+    } catch(Exception ex) {
+        Error("ReleaseVersion - Exception while setting up ReleaseVersion: " +ex.Dump());
+        return null;
+    }
+});

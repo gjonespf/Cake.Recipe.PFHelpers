@@ -1,0 +1,165 @@
+# This should trigger on PRs using a policy, not automagically
+pr:
+  branches:
+    include:
+    - develop
+    - releases/*
+
+trigger:
+  branches:
+    exclude:
+    - master
+    - releases/*
+
+queue:
+  # When I get xplat working...
+  #name: devinf
+  name: Default
+
+variables:
+  - group: "PFDev KeyVault Variables"
+  - group: "PowerFarming.Build Variables"
+
+steps:
+- task: PowerShell@2
+  displayName: Pre initialization
+  inputs:
+      filePath: ./pre.ps1
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      # May possibly need these?
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)
+
+#- task: NuGetCommand@2
+#  displayName: 'Authenticate with NuGet feed'
+#  inputs:
+#    command: custom
+#    arguments: sources update -Name "PowerFarming Nuget" -Source "$(LocalNugetServerUrl)" -Username "$(LocalNugetUserName)" -Password "$(LocalNugetPassword)" -ConfigFile NuGet.Config -StorePasswordInClearText 
+
+# Need prerequisites to use dotnet core first...
+#- powershell: dotnet-cake setup.cake --target="Init" --Verbosity=verbose
+- task: PowerShell@2
+  displayName: Initialization
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Init" -Verbose'
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)
+      CAKE_NUGET_USEINPROCESSCLIENT: false
+      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+      # Gitversion to build props
+      JENKINS_HOME: "~/"
+
+- task: PowerShell@2
+  displayName: Build
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Build" -Verbose'
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+      CAKE_NUGET_USEINPROCESSCLIENT: false
+      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+      # Gitversion to build props
+      JENKINS_HOME: "~/"
+
+- task: PowerShell@2
+  displayName: Test
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Test" -Verbose'
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+  enabled: false
+
+- task: PowerShell@2
+  displayName: Package
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Package" -Verbose'
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+
+- task: PowerShell@2
+  displayName: Publish
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Publish" -Verbose'
+      pwsh: true
+  env:
+      LocalNugetApiKey: $(LocalNugetApiKey)
+      LocalNugetServerUrl: $(LocalNugetServerUrl)
+      LocalNugetUserName: $(LocalNugetUserName)
+      LocalNugetPassword: $(LocalNugetPassword)
+      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+      GITHUB_USERNAME: $(GITHUB-USERNAME)
+      GITUSER: ""
+      GITKEY: ""
+      OCTOAPIKEY: $(OCTOAPIKEY)
+      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+
+  # enabled: false
+

@@ -1,16 +1,5 @@
-
-public static string BuildArtifactPath;
-public static string BuildNumber;
-public static CustomBuildVersion PFBuildVersion;
-
 public static string BuildVersionFileName = "BuildVersion.json";
 public static string GitVersionPropertiesFileName = "gitversion.properties";
-
-Setup<CustomBuildVersion>(context =>
-{
-    var buildVersion = GetPFBuildVersion();
-    return buildVersion;
-});
 
 // VERSIONING
 public class CustomBuildVersion
@@ -28,8 +17,59 @@ public class CustomBuildVersion
     public string CommitHash { get; set; }
     public string CommitDate { get; set; }
     public string BuildId { get; set; }
-    public string BuildNumber { get; set; }
     public string BuildUrl { get; set; }
+}
+
+// Setup<CustomBuildVersion>(context => 
+// {
+//     try {
+//         Verbose("CustomBuildVersion - Setup");
+//         return GenerateCustomBuildVersion(context);
+//     } catch(Exception ex) {
+//         Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
+//         return null;
+//     }
+// });
+
+public CustomBuildVersion GenerateCustomBuildVersion(ISetupContext context)
+{
+    Information("GenerateCustomBuildVersion");
+    var versionFilePath = $"./{BuildVersionFileName}";
+
+    // Try reading props if exists
+    var vers = new CustomBuildVersion() {
+        Version = BuildParameters.Version.Version,
+        SemVersion = BuildParameters.Version.SemVersion,
+        MajorMinorPatch = "0.0.0",
+        Major = "0",
+        Minor = "0",
+        Patch = "0",
+        Milestone = BuildParameters.Version.Milestone,
+        InformationalVersion = BuildParameters.Version.InformationalVersion,
+        FullSemVersion = BuildParameters.Version.FullSemVersion,
+        BranchName = "UNKNOWN",
+        CommitHash = "UNKNOWN",
+        CommitDate = "UNKNOWN",
+        BuildId = EnvironmentVariable("BUILD_NUMBER"),
+        BuildUrl = EnvironmentVariable("BUILD_URL"),
+    };
+
+    // Pull from this if it exists
+    if(FileExists($"./{GitVersionPropertiesFileName}")) {
+        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
+        vers.MajorMinorPatch = props["GitVersion_MajorMinorPatch"];
+        vers.Major = props["GitVersion_Major"];
+        vers.Minor = props["GitVersion_Minor"];
+        vers.Patch = props["GitVersion_Patch"];
+        vers.BranchName = props["GitVersion_BranchName"];
+        vers.CommitHash = props["GitVersion_Sha"];
+        vers.CommitDate = props["GitVersion_CommitDate"];
+    }
+
+    // Fall back on env vars if exists
+    SaveBuildVersion(vers);
+
+    return vers;
 }
 
 public void SaveBuildVersion(CustomBuildVersion buildVer)
@@ -47,113 +87,35 @@ public void SaveBuildVersion(CustomBuildVersion buildVer)
     }
 }
 
-// TODO: Remove/replace with <PFBuildVersion> 
-public CustomBuildVersion GetPFBuildVersion() 
-{
-    CustomBuildVersion PFBuildVersion;
-    var vers = new CustomBuildVersion() {
-        Version = BuildParameters.Version.Version,
-        SemVersion = BuildParameters.Version.SemVersion,
-        MajorMinorPatch = "0.0.0",
-        Major = "0",
-        Minor = "0",
-        Patch = "0",
-        Milestone = BuildParameters.Version.Milestone,
-        InformationalVersion = BuildParameters.Version.InformationalVersion,
-        FullSemVersion = BuildParameters.Version.FullSemVersion,
-        BranchName = "UNKNOWN",
-        CommitHash = "UNKNOWN",
-        CommitDate = "UNKNOWN",
-        BuildId = EnvironmentVariable("BUILD_NUMBER"),
-        BuildUrl = EnvironmentVariable("BUILD_URL"),
-    };
-    // Pull from this if it exists
-    if(FileExists($"./{GitVersionPropertiesFileName}")) {
-        var props = ReadDictionaryFile($"./{GitVersionPropertiesFileName}");
-        vers.MajorMinorPatch = props["GitVersion_MajorMinorPatch"];
-        vers.Major = props["GitVersion_Major"];
-        vers.Minor = props["GitVersion_Minor"];
-        vers.Patch = props["GitVersion_Patch"];
-        vers.BranchName = props["GitVersion_BranchName"];
-        vers.CommitHash = props["GitVersion_Sha"];
-        vers.CommitDate = props["GitVersion_CommitDate"];
-    }
-    var versionFilePath = $"./{BuildVersionFileName}";
-    PFBuildVersion = vers;
-    SaveBuildVersion(vers);
-
-    if(BuildArtifactPath != null) {
-        Information("Copying versioning to build artifact path: "+BuildArtifactPath);
-        EnsureDirectoryExists(BuildArtifactPath);
-        CopyFile(versionFilePath, BuildArtifactPath+$"/{BuildVersionFileName}");
-    } else {
-        Warning("No artifact path set, will not copy version to artifact path");
-    }
-    return (PFBuildVersion);
-}
+// Task("ConfigureCustomBuildVersion")
+//     .Does<CustomBuildVersion>((context, vers) => {
+//         Verbose("ConfigureCustomBuildVersion");
+//     });
 
 Task("Generate-Version-File-PF")
-    // Sets up the artifact directory/build numbers
-    .IsDependentOn("PFInit")    
-    .Does(() => {
-        PFBuildVersion = GetPFBuildVersion();
+    .IsDependentOn("PFInit")
+    .Does<PFCustomBuildParams>((context, parms) => {
+        if(parms.BuildArtifactPath != null) {
+            var versionFilePath = $"./{BuildVersionFileName}";
+            Information("Copying versioning to build artifact path: "+parms.BuildArtifactPath);
+            EnsureDirectoryExists(parms.BuildArtifactPath);
+            CopyFile(versionFilePath, parms.BuildArtifactPath+$"/{BuildVersionFileName}");
+        } else {
+            Error("No artifact path set!");
+        }
     });
 
-public DirectoryPath GetVersioningBaseDirectory()
-{
-    var baseDir = MakeAbsolute(new DirectoryPath("."));
-    var solnDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SolutionDirectoryPath));
-    var sourceDir = MakeAbsolute(new DirectoryPath("./"+BuildParameters.SourceDirectoryPath)); 
-
-    if(DirectoryExists(sourceDir)) {
-        var reason = "Source";
-        baseDir = sourceDir;
-        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
-    } else if(DirectoryExists(solnDir)) {
-        var reason = "Solution";
-        baseDir = solnDir;
-        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
-    } else {
-        var reason = "BaseDir";
-        Information("Using versioning base directory of: "+baseDir+" ("+reason+")");
-    }
-
-    return baseDir;
-}
-
-// TODO: This doesn't seem to be created early enough for first builds to work, need to look into this
-//.WithCriteria(BuildParameters.SourceDirectoryPath != null)
-// TODO: Unsure why, but BuildParameters.SourceDirectoryPath seems to be null here, possibly due to being too early in process
 Task("Create-SolutionInfoVersion")
-	.Does(() => {
-        var baseDir = GetVersioningBaseDirectory();
-        if(BuildParameters.SolutionFilePath != null) {
-            Information("Solution file path: "+BuildParameters.SolutionFilePath);
-        } else {
-            Information("Solution file path is null: "+BuildParameters.SolutionFilePath);
-        }
-        if(BuildParameters.SourceDirectoryPath != null) {
-            Information("Source directory path: "+BuildParameters.SourceDirectoryPath);
-        } else {
-            Information("Source directory path is null: "+BuildParameters.SourceDirectoryPath);
-        }
-
-        if(baseDir != null && DirectoryExists(baseDir)) {
-            Information("Checking versioning on solution path: "+baseDir);
-            var solutionFilePath = MakeAbsolute(new FilePath(baseDir + "/SolutionInfo.cs"));
-            if(!FileExists(solutionFilePath)) {
-                Information("Creating missing SolutionInfo file: "+solutionFilePath);
-                System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
-
-                // Need to regenerate versioning so that the SolutionInfo file is populated
-                BuildParameters.SetBuildVersion(
-                    BuildVersion.CalculatingSemanticVersion(
-                        context: Context
-                    )
-                );
-            }
-        } else {
-            Warning("Base directory was null?");
+    .IsDependentOn("PFInit")
+    .Does(() => {
+        // var solutionFilePath = MakeAbsolute(File("./SolutionInfo.cs"));
+        // if(BuildParameters.SourceDirectoryPath != null && !string.IsNullOrEmpty(BuildParameters.SourceDirectoryPath)) {
+        //     solutionFilePath = MakeAbsolute(File(string.Format("{0}/SolutionInfo.cs", BuildParameters.SourceDirectoryPath);
+        // }
+        var solutionFilePath = BuildParameters.SourceDirectoryPath.CombineWithFilePath("SolutionInfo.cs");
+        if(!FileExists(solutionFilePath)) {
+            Information("Creating missing SolutionInfo file: "+solutionFilePath);
+            System.IO.File.WriteAllText(solutionFilePath.FullPath, "");
         }
     });
 
@@ -163,10 +125,9 @@ Task("Create-SolutionInfoVersion")
 Task("Generate-AssemblyInfo")
 	.Does(() => {
 		Information("Generate-AssemblyInfo started");
-        var baseDir = GetVersioningBaseDirectory();
 
         // Read in solutioninfo
-        var slnInfo = GetFiles(baseDir + "/SolutionInfo.cs").FirstOrDefault();
+        var slnInfo = GetFiles(BuildParameters.SourceDirectoryPath + "/SolutionInfo.cs").FirstOrDefault();
         if(slnInfo == null) {
             Error("No solution info file could be found");
             return;
