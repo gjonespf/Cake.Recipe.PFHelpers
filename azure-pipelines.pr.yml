@@ -12,7 +12,9 @@ trigger:
     - releases/*
 
 queue:
-  name: devinf
+  # When I get xplat working...
+  #name: devinf
+  name: Default
 
 variables:
   - group: "PFDev KeyVault Variables"
@@ -39,18 +41,18 @@ steps:
       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)
 
-- task: NuGetCommand@2
-  displayName: 'Authenticate with NuGet feed'
-  inputs:
-    command: custom
-    arguments: sources update -Name "PowerFarming Nuget" -Source "$(LocalNugetServerUrl)" -Username "$(LocalNugetUserName)" -Password "$(LocalNugetPassword)" -ConfigFile NuGet.Config -StorePasswordInClearText 
+#- task: NuGetCommand@2
+#  displayName: 'Authenticate with NuGet feed'
+#  inputs:
+#    command: custom
+#    arguments: sources update -Name "PowerFarming Nuget" -Source "$(LocalNugetServerUrl)" -Username "$(LocalNugetUserName)" -Password "$(LocalNugetPassword)" -ConfigFile NuGet.Config -StorePasswordInClearText 
 
 # Need prerequisites to use dotnet core first...
 #- powershell: dotnet-cake setup.cake --target="Init" --Verbosity=verbose
 - task: PowerShell@2
   displayName: Initialization
   inputs:
-      filePath: './build.dntool.ps1'
+      filePath: './build.ps1'
       arguments: '-target "Init" -Verbose'
       pwsh: true
   env:
@@ -74,7 +76,7 @@ steps:
 - task: PowerShell@2
   displayName: Build
   inputs:
-      filePath: './build.dntool.ps1'
+      filePath: './build.ps1'
       arguments: '-target "Build" -Verbose'
       pwsh: true
   env:
@@ -95,8 +97,12 @@ steps:
       # Gitversion to build props
       JENKINS_HOME: "~/"
 
-- powershell: .\build.dntool.ps1 -target "Test"
+- task: PowerShell@2
   displayName: Test
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Test" -Verbose'
+      pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
       LocalNugetServerUrl: $(LocalNugetServerUrl)
@@ -113,8 +119,12 @@ steps:
       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
   enabled: false
 
-- powershell: .\build.dntool.ps1 -target "Package"
+- task: PowerShell@2
   displayName: Package
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Package" -Verbose'
+      pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
       LocalNugetServerUrl: $(LocalNugetServerUrl)
@@ -130,8 +140,12 @@ steps:
       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
 
-- powershell: .\build.dntool.ps1 -target "Publish"
+- task: PowerShell@2
   displayName: Publish
+  inputs:
+      filePath: './build.ps1'
+      arguments: '-target "Publish" -Verbose'
+      pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
       LocalNugetServerUrl: $(LocalNugetServerUrl)
@@ -147,5 +161,5 @@ steps:
       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
 
-  enabled: false
+  # enabled: false
 
