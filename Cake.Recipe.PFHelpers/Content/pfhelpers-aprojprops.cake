@@ -1,24 +1,6 @@
 #r Newtonsoft.Json
 using Newtonsoft.Json;
 
-public class ProjectProperties
-{
-    public string ProjectName { get; set; }   
-    public string ProjectCodeName { get; set; }   
-    public string ProjectDescription { get; set; }
-    public string ProjectUrl { get; set; }
-    public string SourceControlUrl { get; set; }
-
-    // TODO: Rework to be more generic and non docker focussed
-    public string DefaultUser { get;set; }
-    public string DefaultRemote { get;set; }
-    public string DefaultLocal { get;set; }
-    public string DefaultTag { get;set; }
-
-    // TODO: Probably split optionals out into a generic property bag
-    public string TeamsWebHook { get;set; }
-}
-
 public static string ProjectPropertiesFileName = "properties.json";
 
 public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
@@ -40,6 +22,7 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
     return props;
 }
 
+// Now in 0setup
 // Setup<ProjectProperties>(setupContext => 
 // {
 //     try {

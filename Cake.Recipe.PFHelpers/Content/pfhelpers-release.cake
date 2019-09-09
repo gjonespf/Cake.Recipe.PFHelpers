@@ -1,16 +1,5 @@
-
-public class ReleaseVersion
-{
-    public string PackagePath { get; set; }
-    public string PackageName { get; set; }
-    public string PackageRepo { get; set; }
-    public string PackageUrl { get; set; }
-    public string Version { get; set; }
-    public string SemVersion { get; set; }
-    public string BranchName { get; set; }
-    public string CommitHash { get; set; }
-    public string CommitDate { get; set; }
-}
+#r Newtonsoft.Json
+using Newtonsoft.Json;
 
 public static string ReleaseVersionFileName = "ReleaseVersion.json";
 

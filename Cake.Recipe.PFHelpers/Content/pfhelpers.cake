@@ -1,3 +1,4 @@
+#load pfhelpers-0classes.cake
 #load pfhelpers-0setup.cake
 
 // Addins
