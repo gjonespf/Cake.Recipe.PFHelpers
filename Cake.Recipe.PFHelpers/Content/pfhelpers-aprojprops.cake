@@ -1,4 +1,4 @@
-#r Newtonsoft.Json
+#addin Newtonsoft.Json&version=12.0.0
 using Newtonsoft.Json;
 
 public static string ProjectPropertiesFileName = "properties.json";
