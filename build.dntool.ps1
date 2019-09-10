@@ -11,9 +11,9 @@ Param(
     [Alias("WhatIf", "Noop")]
     [switch]$DryRun,
     [switch]$Experimental,
-    #[version]$CakeVersion = '0.33.0',
-    [version]$CakeVersion = '0.34.1',
-    [string]$GitVersionVersion = '5.0.2-beta1.51',
+    #[version]$CakeVersion = '0.34.1',
+    [version]$CakeVersion = '0.33.0',
+    [string]$GitVersionVersion = '4.0.1-beta1-58',
     [string]$DotnetToolPath = '.dotnet/tools/',
     [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
     [string[]]$ScriptArgs
@@ -53,18 +53,28 @@ foreach($tool in $defaultToolVers) {
         Write-Information "Installing missing tool $($tool.PackageId)"
         dotnet tool install $tool.PackageId --tool-path $DotnetToolPath --version $tool.Version
     }
-    # Update version (update in dotnet sdk 3 :/)
-    if(($toolvers | ?{ $_.PackageId -eq $tool.PackageId -and $_.Version -ne $tool.Version })) {
+    $dotnetvers = [version](dotnet --version)
+    # Update version (update to specific version coming in dotnet sdk 3 :/)
+    if($dotnetvers.Major -le 2 -and ($toolvers | ?{ $_.PackageId -eq $tool.PackageId -and $_.Version -ne $tool.Version })) {
         Write-Information "Installing updated tool $($tool.PackageId)"
         dotnet tool uninstall $tool.PackageId --tool-path $DotnetToolPath
         dotnet tool install $tool.PackageId --tool-path $DotnetToolPath --version $tool.Version
     }
 }
 
-if(Get-Command "dotnet-cake" -ErrorAction SilentlyContinue) {
+# Ensure we use the specific version we asked for
+$dotnetcake = $DotnetToolPath + "/dotnet-cake"
+if($IsWindows -or $env:windir) {
+    $dotnetcake = $DotnetToolPath + "/dotnet-cake.exe"
+}
+if(Test-Path $dotnetcake) {
+    $dotnetcake = (Resolve-Path $dotnetcake).Path
+
     Write-Information "Running dotnet-cake"
-    dotnet-cake $Script --target=$Target --verbosity=$Verbosity
+    & $dotnetcake $Script --target=$Target --verbosity=$Verbosity
+
 } else {
     Write-Error "Could not find dotnet-cake to run build script"
     Write-Information "Using PATH: $($env:PATH)"
 }
+
