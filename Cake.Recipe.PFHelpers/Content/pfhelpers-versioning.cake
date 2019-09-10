@@ -4,19 +4,6 @@ using Newtonsoft.Json;
 public static string BuildVersionFileName = "BuildVersion.json";
 public static string GitVersionPropertiesFileName = "gitversion.properties";
 
-// VERSIONING
-
-// Setup<CustomBuildVersion>(context => 
-// {
-//     try {
-//         Verbose("CustomBuildVersion - Setup");
-//         return GenerateCustomBuildVersion(context);
-//     } catch(Exception ex) {
-//         Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
-//         return null;
-//     }
-// });
-
 public CustomBuildVersion GenerateCustomBuildVersion(ISetupContext context)
 {
     Information("GenerateCustomBuildVersion");

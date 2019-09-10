@@ -73,6 +73,7 @@ ReleaseVersion.json
 /package-lock.json
 .env
 .env/
+.dotnet/
 .buildenv
 .buildenv/
 .build-cache/

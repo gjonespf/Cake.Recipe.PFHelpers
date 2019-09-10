@@ -57,3 +57,11 @@ Task("PFInit")
     .IsDependentOn("ConfigureCustomBuildParameters")
     .Does<PFCustomBuildParams>((context, parms) => {
     });
+
+// TODO: Update build params based on this info
+Task("ConfigureFromProjectParametersFile")
+    .IsDependentOn("ConfigureProjectProperties")
+    .WithCriteria<ProjectProperties>((context, data) => !string.IsNullOrEmpty(data.ProjectName))
+    .Does<ProjectProperties>(data => {
+        Information("Setting properties based on ProjectProperties file: ", data.ProjectName);
+});
