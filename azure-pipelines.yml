@@ -1,16 +1,13 @@
 trigger:
-  batch: true
-  branches:
-    include:
-    - master
-    #- develop
-    - releases/*
-    - support/*
-    - hotfix/*
+- develop
+- master
+- release/*
+- hotfix/*
+
+pr:
+- develop
 
 queue:
-  # When I get xplat working...
-  #name: devinf
   name: Default
 
 variables:
@@ -18,6 +15,11 @@ variables:
   - group: "PowerFarming.Build Variables"
 
 steps:
+- checkout: self
+  clean: true
+  submodules: true
+  persistCredentials: true
+
 - task: PowerShell@2
   displayName: Pre initialization
   inputs:
@@ -35,6 +37,7 @@ steps:
       GITKEY: ""
       OCTOAPIKEY: $(OCTOAPIKEY)
       OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+      OCTOCLOUDSERVER: $(OCTOCLOUDSERVER)
       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)
 
@@ -44,12 +47,10 @@ steps:
     command: custom
     arguments: sources update -Name "PowerFarming Nuget" -Source "$(LocalNugetServerUrl)" -Username "$(LocalNugetUserName)" -Password "$(LocalNugetPassword)" -ConfigFile NuGet.Config -StorePasswordInClearText 
 
-# Need prerequisites to use dotnet core first...
-#- powershell: dotnet-cake setup.cake --target="Init" --Verbosity=verbose
 - task: PowerShell@2
   displayName: Initialization
   inputs:
-      filePath: './build.ps1'
+      filePath: './build.dntool.ps1'
       arguments: '-target "Init" -Verbose'
       pwsh: true
   env:
@@ -71,10 +72,10 @@ steps:
       JENKINS_HOME: "~/"
 
 - task: PowerShell@2
-  displayName: Build
+  displayName: BuildPackagePublish
   inputs:
-      filePath: './build.ps1'
-      arguments: '-target "Build" -Verbose'
+      filePath: './build.dntool.ps1'
+      arguments: '-target "BuildPackagePublish" -Verbosity verbose'
       pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
@@ -94,69 +95,81 @@ steps:
       # Gitversion to build props
       JENKINS_HOME: "~/"
 
-- task: PowerShell@2
-  displayName: Test
-  inputs:
-      filePath: './build.ps1'
-      arguments: '-target "Test" -Verbose'
-      pwsh: true
-  env:
-      LocalNugetApiKey: $(LocalNugetApiKey)
-      LocalNugetServerUrl: $(LocalNugetServerUrl)
-      LocalNugetUserName: $(LocalNugetUserName)
-      LocalNugetPassword: $(LocalNugetPassword)
-      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
-      GITHUB_USERNAME: $(GITHUB-USERNAME)
-      GITUSER: ""
-      GITKEY: ""
-      OCTOAPIKEY: $(OCTOAPIKEY)
-      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
-      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
-      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
-      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
-  enabled: false
+# - task: PowerShell@2
+#   displayName: Build
+#   inputs:
+#       filePath: './build.dntool.ps1'
+#       arguments: '-target "Build" -Verbose'
+#       pwsh: true
+#   env:
+#       LocalNugetApiKey: $(LocalNugetApiKey)
+#       LocalNugetServerUrl: $(LocalNugetServerUrl)
+#       LocalNugetUserName: $(LocalNugetUserName)
+#       LocalNugetPassword: $(LocalNugetPassword)
+#       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+#       GITHUB_USERNAME: $(GITHUB-USERNAME)
+#       GITUSER: ""
+#       GITKEY: ""
+#       OCTOAPIKEY: $(OCTOAPIKEY)
+#       OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+#       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+#       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+#       CAKE_NUGET_USEINPROCESSCLIENT: false
+#       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+#       # Gitversion to build props
+#       JENKINS_HOME: "~/"
 
-- task: PowerShell@2
-  displayName: Package
-  inputs:
-      filePath: './build.ps1'
-      arguments: '-target "Package" -Verbose'
-      pwsh: true
-  env:
-      LocalNugetApiKey: $(LocalNugetApiKey)
-      LocalNugetServerUrl: $(LocalNugetServerUrl)
-      LocalNugetUserName: $(LocalNugetUserName)
-      LocalNugetPassword: $(LocalNugetPassword)
-      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
-      GITHUB_USERNAME: $(GITHUB-USERNAME)
-      GITUSER: ""
-      GITKEY: ""
-      OCTOAPIKEY: $(OCTOAPIKEY)
-      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
-      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
-      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
-      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+# - powershell: .\build.dntool.ps1 -target "Test"
+#   displayName: Test
+#   env:
+#       LocalNugetApiKey: $(LocalNugetApiKey)
+#       LocalNugetServerUrl: $(LocalNugetServerUrl)
+#       LocalNugetUserName: $(LocalNugetUserName)
+#       LocalNugetPassword: $(LocalNugetPassword)
+#       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+#       GITHUB_USERNAME: $(GITHUB-USERNAME)
+#       GITUSER: ""
+#       GITKEY: ""
+#       OCTOAPIKEY: $(OCTOAPIKEY)
+#       OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+#       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+#       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+#       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+#   enabled: false
 
-- task: PowerShell@2
-  displayName: Publish
-  inputs:
-      filePath: './build.ps1'
-      arguments: '-target "Publish" -Verbose'
-      pwsh: true
-  env:
-      LocalNugetApiKey: $(LocalNugetApiKey)
-      LocalNugetServerUrl: $(LocalNugetServerUrl)
-      LocalNugetUserName: $(LocalNugetUserName)
-      LocalNugetPassword: $(LocalNugetPassword)
-      GITHUB_PASSWORD: $(GITHUB-PASSWORD)
-      GITHUB_USERNAME: $(GITHUB-USERNAME)
-      GITUSER: ""
-      GITKEY: ""
-      OCTOAPIKEY: $(OCTOAPIKEY)
-      OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
-      OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
-      OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
-      CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+# - powershell: .\build.dntool.ps1 -target "Package"
+#   displayName: Package
+#   env:
+#       LocalNugetApiKey: $(LocalNugetApiKey)
+#       LocalNugetServerUrl: $(LocalNugetServerUrl)
+#       LocalNugetUserName: $(LocalNugetUserName)
+#       LocalNugetPassword: $(LocalNugetPassword)
+#       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+#       GITHUB_USERNAME: $(GITHUB-USERNAME)
+#       GITUSER: ""
+#       GITKEY: ""
+#       OCTOAPIKEY: $(OCTOAPIKEY)
+#       OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+#       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+#       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+#       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
 
-  enabled: false
+# - powershell: .\build.dntool.ps1 -target "Publish"
+#   displayName: Publish
+#   env:
+#       LocalNugetApiKey: $(LocalNugetApiKey)
+#       LocalNugetServerUrl: $(LocalNugetServerUrl)
+#       LocalNugetUserName: $(LocalNugetUserName)
+#       LocalNugetPassword: $(LocalNugetPassword)
+#       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
+#       GITHUB_USERNAME: $(GITHUB-USERNAME)
+#       GITUSER: ""
+#       GITKEY: ""
+#       OCTOAPIKEY: $(OCTOAPIKEY)
+#       OCTOCLOUDAPIKEY: $(OCTOCLOUDAPIKEY)
+#       OCTOPUS_CLI_API_KEY: $(OCTOPUS-CLI-APIKEY)
+#       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
+#       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
+
+  # enabled: false
 

@@ -1,16 +1,6 @@
+#addin nuget:?package=Newtonsoft.Json&version=11.0.2
 
-public class ReleaseVersion
-{
-    public string PackagePath { get; set; }
-    public string PackageName { get; set; }
-    public string PackageRepo { get; set; }
-    public string PackageUrl { get; set; }
-    public string Version { get; set; }
-    public string SemVersion { get; set; }
-    public string BranchName { get; set; }
-    public string CommitHash { get; set; }
-    public string CommitDate { get; set; }
-}
+using Newtonsoft.Json;
 
 public static string ReleaseVersionFileName = "ReleaseVersion.json";
 

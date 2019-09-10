@@ -6,63 +6,75 @@ Param(
     [string]$Target = "build",
     [string]$Configuration,
     [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
-    [string]$Verbosity,
+    [string]$Verbosity="Minimal",
     [switch]$ShowDescription,
     [Alias("WhatIf", "Noop")]
     [switch]$DryRun,
     [switch]$Experimental,
-    [switch]$Mono,
+    #[version]$CakeVersion = '0.34.1',
     [version]$CakeVersion = '0.33.0',
-    [switch]$UseNetCore = $true,
+    [string]$GitVersionVersion = '4.0.1-beta1-58',
+    [string]$DotnetToolPath = '.dotnet/tools/',
     [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
     [string[]]$ScriptArgs
 )
 
-if(!($env:PATH -match ".dotnet") -and $IsLinux) {
-    if(Test-Path "~/.dotnet/tools") {
-        $toolsPath = (Resolve-Path "~/.dotnet/tools").Path
-        $env:PATH = $env:PATH + ":$toolsPath"
-    } else {
-        Write-Warning "Couldn't find dotnet core tools directory"
+$toolPathExists = Resolve-Path $DotnetToolPath -ErrorAction SilentlyContinue
+if(!($toolPathExists)) {
+    New-Item -ItemType Directory -Path $DotnetToolPath | Out-Null
+}
+
+function New-DotnetToolDefinition ($PackageId, $Version, $CommandName) {
+    [pscustomobject] @{
+        PackageId = $PackageId
+        Version = $Version
+        CommandName = $CommandName
     }
 }
 
-# TODO: Until we can get this working, manually use Nuget pull
-$brokenInternalNuget = $IsLinux
-if($brokenInternalNuget)
-{
-    $env:CAKE_NUGET_USEINPROCESSCLIENT="false"
-    $TOOLS_DIR = Join-Path $PSScriptRoot "tools"
-    $NUGET_EXE = Join-Path $TOOLS_DIR "nuget.exe"
-    $NUGET_URL = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-    $PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
-    $PACKAGES_CONFIG_MD5 = Join-Path $TOOLS_DIR "packages.config.md5sum"
-    
-    if (!(Test-Path $NUGET_EXE)) {
-        Write-Verbose -Message "Downloading missing NuGet.exe..."
-        $NUGET_EXE = Join-Path $TOOLS_DIR "nuget.exe"
-        try {
-            (New-Object System.Net.WebClient).DownloadFile($NUGET_URL, $NUGET_EXE)
-        } catch {
-            Throw "Could not download NuGet.exe."
-        }
+# Check existing versions...
+$toollist = (dotnet tool list --tool-path $DotnetToolPath)
+$toolvers = ($toollist | Select-Object -Skip 2) | %{ $packageId, $version, $commandname = $_.Trim() -split '\s+'
+    [pscustomobject] @{
+        PackageId = $packageId
+        Version = $version
+        CommandName = $commandname
     }
+}
+# TODO: Load from a json config as alternative?
+$defaultToolVers = @(
+    New-DotnetToolDefinition -PackageId "cake.tool" -Version $CakeVersion -CommandName "dotnet-cake"
+    New-DotnetToolDefinition -PackageId "gitversion.tool" -Version $GitVersionVersion -CommandName "dotnet-gitversion"
+)
 
-    $NUGET_EXE = (Resolve-Path $NUGET_EXE).Path
-    $ENV:NUGET_EXE = $NUGET_EXE
-    Write-Verbose "Using nuget at: $NUGET_EXE"
-
-    Write-Verbose "Restoring from Nuget"
-    $NuGetOutput = Invoke-Expression "& nuget install -ExcludeVersion -PreRelease -OutputDirectory `"$TOOLS_DIR`" "
-    #$NuGetOutput = Invoke-Expression "& $nugetMono `"$NUGET_EXE`" install -ExcludeVersion -PreRelease -OutputDirectory `"$TOOLS_DIR`" "
-
-
+foreach($tool in $defaultToolVers) {
+    # New install
+    if(!($toolvers | ?{ $_.PackageId -eq $tool.PackageId })) {
+        Write-Information "Installing missing tool $($tool.PackageId)"
+        dotnet tool install $tool.PackageId --tool-path $DotnetToolPath --version $tool.Version
+    }
+    $dotnetvers = [version](dotnet --version)
+    # Update version (update to specific version coming in dotnet sdk 3 :/)
+    if($dotnetvers.Major -le 2 -and ($toolvers | ?{ $_.PackageId -eq $tool.PackageId -and $_.Version -ne $tool.Version })) {
+        Write-Information "Installing updated tool $($tool.PackageId)"
+        dotnet tool uninstall $tool.PackageId --tool-path $DotnetToolPath
+        dotnet tool install $tool.PackageId --tool-path $DotnetToolPath --version $tool.Version
+    }
 }
 
-if(Get-Command "dotnet-cake" -ErrorAction SilentlyContinue) {
-    Write-Information "Running dotnet-cake"
-    dotnet-cake $Script --target=$Target
+# Ensure we use the specific version we asked for
+$dotnetcake = $DotnetToolPath + "/dotnet-cake"
+if($IsWindows -or $env:windir) {
+    $dotnetcake = $DotnetToolPath + "/dotnet-cake.exe"
+}
+if(Test-Path $dotnetcake) {
+    $dotnetcake = (Resolve-Path $dotnetcake).Path
+
+    Write-Information "Running dotnet-cake from path ($dotnetcake)"
+    & $dotnetcake $Script --target=$Target --verbosity=$Verbosity
+
 } else {
     Write-Error "Could not find dotnet-cake to run build script"
     Write-Information "Using PATH: $($env:PATH)"
 }
+

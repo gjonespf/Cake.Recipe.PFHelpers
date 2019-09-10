@@ -1,18 +1,4 @@
-public class DockerDetails
-{
-    public string ImageName { get; set; }
-    public string ImageDescription { get; set; }
-    public string ImageUrl { get; set; }
-    public string GitUrl { get; set; }
 
-    public string BuildId { get;set; }
-    public string[] BuildArguments { get; set; }
-
-    public string[] LocalTags { get; set; }
-    public string DefaultLocal { get;set; }
-    public string[] RemoteTags { get; set; }
-    public string DefaultRemote { get;set; }
-}
 
 public DockerDetails GetDockerDetails(PFCustomBuildParams parms)
 {
@@ -24,12 +10,14 @@ public DockerDetails GetDockerDetails(PFCustomBuildParams parms)
     var props = parms.ProjectProps;
     var PFBuildVersion = parms.PFBuildVersion;
 
-    var imageName = "UNKNOWN";
-    var imageDesc = "UNKNOWN";
-    var imageUrl = "UNKNOWN";
     var repoDir = DirectoryPath.FromString(".");
     var buildNumber = "UNKNOWN";
     var semVer = "UNKNOWN";
+
+    // Defaults
+    ret.ImageName = "UNKNOWN";
+    ret.ImageDescription = "UNKNOWN";
+    ret.ImageUrl = "UNKNOWN";
 
     // if(PFBuildVersion == null) {
     //     throw new ApplicationException("GetDockerDetails - PFBuildVersion is missing");

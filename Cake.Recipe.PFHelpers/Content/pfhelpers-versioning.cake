@@ -1,35 +1,9 @@
+#addin nuget:?package=Newtonsoft.Json&version=11.0.2
+
+using Newtonsoft.Json;
+
 public static string BuildVersionFileName = "BuildVersion.json";
 public static string GitVersionPropertiesFileName = "gitversion.properties";
-
-// VERSIONING
-public class CustomBuildVersion
-{
-    public string Version { get; set; }
-    public string SemVersion { get; set; }
-    public string MajorMinorPatch { get; set; }
-    public string Major { get; set; }
-    public string Minor { get; set; }
-    public string Patch { get; set; }
-    public string Milestone { get; set; }
-    public string InformationalVersion { get; set; }
-    public string FullSemVersion { get; set; }
-    public string BranchName { get; set; }
-    public string CommitHash { get; set; }
-    public string CommitDate { get; set; }
-    public string BuildId { get; set; }
-    public string BuildUrl { get; set; }
-}
-
-// Setup<CustomBuildVersion>(context => 
-// {
-//     try {
-//         Verbose("CustomBuildVersion - Setup");
-//         return GenerateCustomBuildVersion(context);
-//     } catch(Exception ex) {
-//         Error("CustomBuildVersion - Exception while setting up CustomBuildVersion: " +ex.Dump());
-//         return null;
-//     }
-// });
 
 public CustomBuildVersion GenerateCustomBuildVersion(ISetupContext context)
 {
