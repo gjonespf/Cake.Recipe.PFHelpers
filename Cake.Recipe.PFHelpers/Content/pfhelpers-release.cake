@@ -1,4 +1,4 @@
-#addin Newtonsoft.Json&version=12.0.0
+#addin Newtonsoft.Json&version=12.0.2
 using Newtonsoft.Json;
 
 public static string ReleaseVersionFileName = "ReleaseVersion.json";
