@@ -1,4 +1,4 @@
-#addin nuget:?package=Newtonsoft.Json&version=12.0.2
+#addin nuget:?package=Newtonsoft.Json&version=11.0.2
 
 using Newtonsoft.Json;
 
