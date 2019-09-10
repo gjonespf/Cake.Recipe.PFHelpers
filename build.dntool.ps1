@@ -70,7 +70,7 @@ if($IsWindows -or $env:windir) {
 if(Test-Path $dotnetcake) {
     $dotnetcake = (Resolve-Path $dotnetcake).Path
 
-    Write-Information "Running dotnet-cake"
+    Write-Information "Running dotnet-cake from path ($dotnetcake)"
     & $dotnetcake $Script --target=$Target --verbosity=$Verbosity
 
 } else {
