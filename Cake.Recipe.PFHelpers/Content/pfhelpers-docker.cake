@@ -74,16 +74,16 @@ public DockerDetails GetDockerDetails(PFCustomBuildParams parms)
     var cleanBranchName = currentBranch.FriendlyName.Replace("/", "-").Replace("\\", "-");
 
     ret.LocalTags =  new string[] { 
-                    (props.DefaultUser + "/" + ret.ImageName+":"+semVer), 
-                    (props.DefaultUser + "/" + ret.ImageName+":"+cleanBranchName),
+                    (props.DockerDefaultUser + "/" + ret.ImageName+":"+semVer), 
+                    (props.DockerDefaultUser + "/" + ret.ImageName+":"+cleanBranchName),
     };
-    ret.DefaultLocal = (props.DefaultUser + "/" + ret.ImageName+":"+semVer);
+    ret.DefaultLocal = (props.DockerDefaultUser + "/" + ret.ImageName+":"+semVer);
 
     ret.RemoteTags =  new string[] { 
-                    props.DefaultRemote + "/" + props.DefaultUser + "/" + (ret.ImageName+":"+semVer), 
-                    props.DefaultRemote + "/" + props.DefaultUser + "/" + (ret.ImageName+":"+cleanBranchName),
+                    props.DockerDefaultRemote + "/" + props.DockerDefaultUser + "/" + (ret.ImageName+":"+semVer), 
+                    props.DockerDefaultRemote + "/" + props.DockerDefaultUser + "/" + (ret.ImageName+":"+cleanBranchName),
     };
-    ret.DefaultRemote = props.DefaultRemote + "/" + props.DefaultUser + "/" + (ret.ImageName+":"+semVer);
+    ret.DefaultRemote = props.DockerDefaultRemote + "/" + props.DockerDefaultUser + "/" + (ret.ImageName+":"+semVer);
 
     return ret;
 }

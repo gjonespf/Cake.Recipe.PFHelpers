@@ -20,6 +20,18 @@ public ProjectProperties LoadProjectProperties(DirectoryPath rootPath = null)
     } else {
         Console.WriteLine($"Couldn't find properties file (using: '{propertiesFilePath}')");
     }
+
+    // Defaults from environment otherwise
+    props.ProjectName = props.ProjectName ?? EnvironmentVariable("ProjectName");
+    props.ProjectCodeName = props.ProjectCodeName ?? EnvironmentVariable("ProjectCodeName");
+    props.ProjectDescription = props.ProjectDescription ?? EnvironmentVariable("ProjectDescription");
+    props.ProjectUrl = props.ProjectUrl ?? EnvironmentVariable("ProjectUrl");
+    props.ProjectVersioning = props.ProjectVersioning ?? EnvironmentVariable("ProjectVersioning");
+    props.ProjectLocalPublicNugetServerUrl = props.ProjectLocalPublicNugetServerUrl ?? EnvironmentVariable("ProjectLocalPublicNugetServerUrl");
+    props.ProjectNugetGithubPackageFeed = props.ProjectNugetGithubPackageFeed ?? EnvironmentVariable("ProjectNugetGithubPackageFeed");
+
+    props.TeamsWebHook = props.TeamsWebHook ?? EnvironmentVariable("TeamsWebHook");
+    
     return props;
 }
 

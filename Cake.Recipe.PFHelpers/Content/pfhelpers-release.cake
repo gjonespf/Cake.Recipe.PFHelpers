@@ -52,7 +52,7 @@ public ReleaseVersion GenerateReleaseVersion(PFCustomBuildParams parms)
     if(props != null)
     {
             relVer.PackageName = props.ProjectName;
-            relVer.PackageRepo = props.DefaultRemote;
+            relVer.PackageRepo = props.DockerDefaultRemote;
     }
     return  relVer;
 }

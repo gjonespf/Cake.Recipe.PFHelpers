@@ -1,0 +1,12 @@
+[
+    {
+      "PackageId": "cake.tool",
+      "Version": "0.33.0",
+      "CommandName": "dotnet-cake"
+    },
+    {
+      "PackageId": "gitversion.tool",
+      "Version": "4.0.1-beta1-58",
+      "CommandName": "dotnet-gitversion"
+    }
+  ]
