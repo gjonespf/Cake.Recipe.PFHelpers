@@ -5,6 +5,6 @@
     "ProjectUrl": "https://github.com/gjonespf/Cake.Recipe.PFHelpers",
     "ProjectVersioning": "gitver",
     "TeamsWebHook": "",
-    "ProjectLocalPublicNugetServerUrl": "https://nuget-public.devinf.powerfarming.co.nz/api/v3/index.json",
+    "ProjectLocalPublicNugetServerUrl": "http://nuget-public.devinf.powerfarming.co.nz/api/v3/index.json",
     "ProjectNugetGithubPackageFeed": "https://nuget.pkg.github.com/gjonespf/Cake.Recipe.PFHelpers/index.json"
 }
