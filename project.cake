@@ -1,7 +1,3 @@
-
-
-
-
 Task("Init")
     .IsDependentOn("ConfigureFromProjectParametersFile")
     .IsDependentOn("PFInit")
@@ -16,6 +12,12 @@ BuildParameters.Tasks.CleanTask
     .Does(() => {
     });
 
+ BuildParameters.Tasks.BuildTask
+    .IsDependentOn("Init")
+    .IsDependentOn("Generate-AssemblyInfo")
+    .Does(() => {
+	});
+    
 BuildParameters.Tasks.PackageTask
 	.IsDependentOn("Generate-Version-File-PF")
 	.IsDependentOn("Package-GenerateReleaseVersion")
@@ -23,8 +25,3 @@ BuildParameters.Tasks.PackageTask
     .Does(() => {
 	});
 
- BuildParameters.Tasks.BuildTask
-    .IsDependentOn("Init")
-    .IsDependentOn("Generate-AssemblyInfo")
-    .Does(() => {
-	});
