@@ -5,12 +5,16 @@ public class ProjectProperties
     public string ProjectDescription { get; set; }
     public string ProjectUrl { get; set; }
     public string SourceControlUrl { get; set; }
+    public string ProjectVersioning { get; set; }
+
+    public string ProjectLocalPublicNugetServerUrl { get; set; }
+    public string ProjectNugetGithubPackageFeed { get; set; }
 
     // TODO: Rework to be more generic and non docker focussed
-    public string DefaultUser { get;set; }
-    public string DefaultRemote { get;set; }
-    public string DefaultLocal { get;set; }
-    public string DefaultTag { get;set; }
+    public string DockerDefaultUser { get;set; }
+    public string DockerDefaultRemote { get;set; }
+    public string DockerDefaultLocal { get;set; }
+    public string DockerDefaultTag { get;set; }
 
     // TODO: Probably split optionals out into a generic property bag
     public string TeamsWebHook { get;set; }
