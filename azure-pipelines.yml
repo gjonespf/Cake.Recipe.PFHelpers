@@ -30,6 +30,8 @@ steps:
       LocalNugetServerUrl: $(LocalNugetServerUrl)
       LocalNugetUserName: $(LocalNugetUserName)
       LocalNugetPassword: $(LocalNugetPassword)
+      LocalPublicNugetApiKey: $(LocalPublicNugetApiKey)
+      GITHUB_API_TOKEN: $(GITHUB-API-TOKEN)
       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
       GITHUB_USERNAME: $(GITHUB-USERNAME)
       # May possibly need these?
@@ -51,13 +53,15 @@ steps:
   displayName: Initialization
   inputs:
       filePath: './build.dntool.ps1'
-      arguments: '-target "Init" -Verbose'
+      arguments: '-target "Init" -InformationAction Continue -Verbosity $(Verbosity)'
       pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
       LocalNugetServerUrl: $(LocalNugetServerUrl)
       LocalNugetUserName: $(LocalNugetUserName)
       LocalNugetPassword: $(LocalNugetPassword)
+      LocalPublicNugetApiKey: $(LocalPublicNugetApiKey)
+      GITHUB_API_TOKEN: $(GITHUB-API-TOKEN)
       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
       GITHUB_USERNAME: $(GITHUB-USERNAME)
       GITUSER: ""
@@ -75,13 +79,15 @@ steps:
   displayName: BuildPackagePublish
   inputs:
       filePath: './build.dntool.ps1'
-      arguments: '-target "BuildPackagePublish" -Verbosity verbose'
+      arguments: '-target "BuildPackagePublish" -InformationAction Continue -Verbosity $(Verbosity)'
       pwsh: true
   env:
       LocalNugetApiKey: $(LocalNugetApiKey)
       LocalNugetServerUrl: $(LocalNugetServerUrl)
       LocalNugetUserName: $(LocalNugetUserName)
       LocalNugetPassword: $(LocalNugetPassword)
+      LocalPublicNugetApiKey: $(LocalPublicNugetApiKey)
+      GITHUB_API_TOKEN: $(GITHUB-API-TOKEN)
       GITHUB_PASSWORD: $(GITHUB-PASSWORD)
       GITHUB_USERNAME: $(GITHUB-USERNAME)
       GITUSER: ""
@@ -99,7 +105,7 @@ steps:
 #   displayName: Build
 #   inputs:
 #       filePath: './build.dntool.ps1'
-#       arguments: '-target "Build" -Verbose'
+#       arguments: '-target "Build" -Verbose -Verbosity $(Verbosity)'
 #       pwsh: true
 #   env:
 #       LocalNugetApiKey: $(LocalNugetApiKey)
@@ -119,7 +125,7 @@ steps:
 #       # Gitversion to build props
 #       JENKINS_HOME: "~/"
 
-# - powershell: .\build.dntool.ps1 -target "Test"
+# - powershell: .\build.dntool.ps1 -target "Test" -Verbosity $(Verbosity)
 #   displayName: Test
 #   env:
 #       LocalNugetApiKey: $(LocalNugetApiKey)
@@ -137,7 +143,7 @@ steps:
 #       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
 #   enabled: false
 
-# - powershell: .\build.dntool.ps1 -target "Package"
+# - powershell: .\build.dntool.ps1 -target "Package" -Verbosity $(Verbosity)
 #   displayName: Package
 #   env:
 #       LocalNugetApiKey: $(LocalNugetApiKey)
@@ -154,7 +160,7 @@ steps:
 #       OCTOPUS_CLI_SERVER: $(OCTOPUS-CLI-SERVER)  
 #       CAKE_SETTINGS_SKIPPACKAGEVERSIONCHECK: true
 
-# - powershell: .\build.dntool.ps1 -target "Publish"
+# - powershell: .\build.dntool.ps1 -target "Publish" -Verbosity $(Verbosity)
 #   displayName: Publish
 #   env:
 #       LocalNugetApiKey: $(LocalNugetApiKey)

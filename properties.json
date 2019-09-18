@@ -4,8 +4,7 @@
     "ProjectDescription": "Simple helpers for Cake.Recipe - Power Farming",
     "ProjectUrl": "https://github.com/gjonespf/Cake.Recipe.PFHelpers",
     "ProjectVersioning": "gitver",
-    "DefaultTag": "latest",
-    "DefaultUser": "gavinjonespf",
-    "DefaultRemote": "https://nuget.powerfarming.co.nz",
-    "TeamsWebHook": ""
+    "TeamsWebHook": "",
+    "ProjectLocalPublicNugetServerUrl": "https://nuget-public.devinf.powerfarming.co.nz/api/v3/index.json",
+    "ProjectNugetGithubPackageFeed": "https://nuget.pkg.github.com/gjonespf/Cake.Recipe.PFHelpers/index.json"
 }
