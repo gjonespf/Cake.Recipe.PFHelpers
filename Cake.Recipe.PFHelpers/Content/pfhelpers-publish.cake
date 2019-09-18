@@ -60,6 +60,7 @@ Task("Publish-LocalNugetCache")
 
 // TODO: RequireAddin and env vars override
 Task("Publish-LocalNuget")
+    .IsDependentOn("PFInit")
     .Does(() => {
         var SourceUrl = EnvironmentVariable("LocalNugetServerUrl");
         var ApiKey = EnvironmentVariable("LocalNugetApiKey");
@@ -91,6 +92,7 @@ Task("Publish-LocalNuget")
     });
 
 Task("Publish-LocalPublicNuget")
+    .IsDependentOn("PFInit")
     .Does(() => {
         var SourceUrl = EnvironmentVariable("ProjectLocalPublicNugetServerUrl");
         var ApiKey = EnvironmentVariable("LocalPublicNugetApiKey");
@@ -122,6 +124,7 @@ Task("Publish-LocalPublicNuget")
     });
 
 Task("Publish-GitHubNuget")
+    .IsDependentOn("PFInit")
     .Does(() => {
         var SourceUrl = EnvironmentVariable("ProjectNugetGitHubPackageFeed");
         var ApiUser = EnvironmentVariable("GITHUB_USERNAME");
