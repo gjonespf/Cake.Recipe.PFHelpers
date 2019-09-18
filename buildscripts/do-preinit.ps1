@@ -4,16 +4,6 @@
 # Functions
 #===============
 
-function Install-PrePrerequisites() {
-    $gitps = Get-Module PowerGit -ErrorAction SilentlyContinue
-
-    if(!($gitps)) {
-        Install-Module PowerGit -Scope CurrentUser
-    } else {
-        Update-Module PowerGit
-    }
-}
-
 function Get-GitCurrentBranch {
     (git symbolic-ref --short HEAD)
 }
@@ -58,76 +48,10 @@ function Invoke-GitFetchRemoteBranches($CurrentBranch) {
     git checkout $CurrentBranch
 }
 
-# TODO: These should also be in the build env setup
-function Install-DotnetBuildTools() {
-    Write-Host "Installing dotnet core build tools"
-    dotnet tool install Octopus.DotNet.Cli --global
-    dotnet tool install Cake.Tool --global --version 0.33.0
-    dotnet tool install Gitversion.Tool --global --version 4.0.1-beta1-58
-
-    # Make sure tools are in path?
-    #export PATH="$PATH:/root/.dotnet/tools"
-    if(!($env:PATH -match ".dotnet")) {
-        if(Test-Path "~/.dotnet/tools") {
-            $toolsPath = (Resolve-Path "~/.dotnet/tools").Path
-            $env:PATH = $env:PATH + ":$toolsPath"
-        } else {
-            Write-Warning "Couldn't find dotnet core tools directory"
-        }
-    }
-    Write-Host "Using PATH: $($env:PATH)"
-
-    # Minimum cake versions, should be handled by cake install above...
-    if(Get-Command "dotnet-cake" -ErrorAction SilentlyContinue) {
-        $cakeVersion = [Version](dotnet-cake --version)
-        if($cakeVersion -lt "0.33.0") {
-            dotnet tool update Cake.Tool --global
-        }
-    } else {
-        Write-Warning "dotnet-cake could not be run to check version for some reason, please check scripts"
-    }
-
-    $gitverVersion = (dotnet-gitversion /version)
-}
-
-# TODO: These should also be in the build env setup
-function Install-DotnetBuildToolsOptional() {
-    $toolsList = (dotnet tool list -g)
-
-    # Other possibly useful tools
-    if(!($toolsList | ?{ $_ -match "coverlet.console" })) {
-        dotnet tool install -g coverlet.console
-    }
-    if(!($toolsList | ?{ $_ -match "FluentMigrator.DotNet.Cli" })) {
-        dotnet tool install -g FluentMigrator.DotNet.Cli
-    }
-    if(!($toolsList | ?{ $_ -match "GitReleaseManager.Tool" })) {
-        dotnet tool install -g GitReleaseManager.Tool
-    }
-    if(!($toolsList | ?{ $_ -match "dotnet-outdated" })) {
-        dotnet tool install -g dotnet-outdated
-    }
-    if(!($toolsList | ?{ $_ -match "dotnet-t4" })) {
-        dotnet tool install -g dotnet-t4
-    }
-    if(!($toolsList | ?{ $_ -match "github-issues-cli" })) {
-        dotnet tool install -g github-issues-cli
-    }
-    if(!($toolsList | ?{ $_ -match "NuGetUtils.Tool.Exec" })) {
-        dotnet tool install -g NuGetUtils.Tool.Exec
-    }
-    if(!($toolsList | ?{ $_ -match "dotnet-reportgenerator-globaltool" })) {
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-    }
-}
-
 function Install-NugetCaching() {
     # Enable nuget caching
     if($env:HTTP_PROXY) {
-        $nuget = Get-Command nuget -ErrorAction SilentlyContinue
-        if(!($nuget) -and (Test-Path "./tools/nuget.exe")) {
-            $nuget = Resolve-Path  "./tools/nuget.exe"
-        }
+        $nuget = Get-Command nuget
         if($nuget)
         {
             Write-Host "Setting Nuget proxy to '$env:HTTP_PROXY'"
@@ -306,7 +230,8 @@ $isJenkinsNode = $env:JENKINS_HOME
 Install-PrePrerequisites
 Install-NugetCaching
 Clear-GitversionCache
-Install-DotnetBuildTools
+# These are set up as part of the build.dntool.ps1 now...
+# Install-DotnetBuildTools
 
 if(!($isVSTSNode) -and !($isJenkinsNode)) {
     Invoke-PreauthSetup -FetchBranches:($isJenkinsNode)
