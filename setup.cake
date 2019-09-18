@@ -8,6 +8,7 @@ var buildDefaultsFile = "./properties.json";
 Environment.SetVariableNames();
 
 // TODO: Load buildDefaultsFile as defaults, override with project.cake
+#load project-tasks.cake
 #load project.cake
 
 BuildParameters.PrintParameters(Context);
