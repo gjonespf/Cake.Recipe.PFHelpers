@@ -92,7 +92,7 @@ if($DotnetToolDefinitionsPath -and (Test-Path $DotnetToolDefinitionsPath)) {
 }
 
 Write-Information "Using dotnet-tools versions:"
-$dotnetToolsVersions
+Write-Information $dotnetToolsVersions
 
 Invoke-DotnetToolUpdate -DotnetToolPath $DotnetToolPath -DotnetToolDefinitions $dotnetToolsVersions
 

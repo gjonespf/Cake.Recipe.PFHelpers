@@ -77,7 +77,79 @@ Task("Publish-LocalNuget")
             // Push the package.
             NuGetPush(nupkgFile, new NuGetPushSettings {
                 Source = SourceUrl,
-                ApiKey = ApiKey
+                ApiKey = ApiKey,
+                ArgumentCustomization = (args) => {
+                    return args;
+                }
             });
         }
+    })
+    .OnError(exception =>
+    {
+        // Let's not abort the build completely if the push fails, as it may be a conflict
+        // TODO: Identify conflict?
     });
+
+Task("Publish-LocalPublicNuget")
+    .Does(() => {
+        var SourceUrl = EnvironmentVariable("ProjectLocalPublicNugetServerUrl");
+        var ApiKey = EnvironmentVariable("LocalPublicNugetApiKey");
+        var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+        var DestinationName = "Local Public Nuget";
+        var keyExists = !string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT";
+        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {keyExists}");
+
+        if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
+            throw new ApplicationException("Environmental variables 'ProjectLocalPublicNugetServerUrl' and 'LocalPublicNugetApiKey' must be set to use this");
+        }
+
+        foreach(var nupkgFile in nupkgFiles)
+        {
+            // Push the package.
+            NuGetPush(nupkgFile, new NuGetPushSettings {
+                Source = SourceUrl,
+                ApiKey = ApiKey,
+                ArgumentCustomization = (args) => {
+                    return args;
+                }
+            });
+        }
+    })
+    .OnError(exception =>
+    {
+        // Let's not abort the build completely if the push fails, as it may be a conflict
+        // TODO: Identify conflict?
+    });
+
+Task("Publish-GitHubNuget")
+    .Does(() => {
+        var SourceUrl = EnvironmentVariable("ProjectNugetGitHubPackageFeed");
+        var ApiUser = EnvironmentVariable("GITHUB_USERNAME");
+        var ApiKey = EnvironmentVariable("GITHUB_API_TOKEN");
+        var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+        var DestinationName = "GitHub Nuget";
+        var keyExists = !string.IsNullOrEmpty(ApiKey)?"PRESENT":"ABSENT";
+        Information($"Publishing to {DestinationName} with source: {SourceUrl} and key: {keyExists}");
+
+        if(string.IsNullOrEmpty(SourceUrl) || string.IsNullOrEmpty(ApiKey)) {
+            throw new ApplicationException("Environmental variables 'ProjectNugetGitHubPackageFeed', 'GITHUB_USERNAME' and 'GITHUB_API_TOKEN' must be set to use this");
+        }
+
+        foreach(var nupkgFile in nupkgFiles)
+        {
+            // Push the package.
+            NuGetPush(nupkgFile, new NuGetPushSettings {
+                Source = SourceUrl,
+                ApiKey = ApiKey,
+                ArgumentCustomization = (args) => {
+                    return args;
+                }
+            });
+        }
+    })
+    .OnError(exception =>
+    {
+        // Let's not abort the build completely if the push fails, as it may be a conflict
+        // TODO: Identify conflict?
+    });
+    

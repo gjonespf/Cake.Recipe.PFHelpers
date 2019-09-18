@@ -1,4 +1,5 @@
-#load "common.cake"
+// Temporary testing funcs
+#load "project-tasks-pfhelpers.cake"
 
 // TODO: Should be done in setup.cake pulling from properties.json? Or same here?
 BuildParameters.SetParameters(context: Context,
